@@ -1,0 +1,282 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.page-container {
+  width: 1440px;
+  min-height: 2681px;
+  position: relative;
+  background: rgba(27, 46, 23, 0.80);
+  overflow: visible;
+  margin: 0 auto;
+  color: #F4EFE9;
+}
+
+/* Header & Navbar */
+.header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1440px;
+  height: 80px;
+  z-index: 10;
+}
+
+.header-bg {
+  width: 100%;
+  height: 100%;
+  background: #1B2E17;
+}
+
+.logo-placeholder {
+  width: 70px;
+  height: 70px;
+  left: 108px;
+  top: 5px;
+  position: absolute;
+  background: #D9D9D9;
+}
+
+.logo-main {
+  width: 66.01px;
+  height: 66.01px;
+  left: 110px;
+  top: 7.03px;
+  position: absolute;
+}
+
+.nav-menu {
+  position: absolute;
+  top: 25px;
+  left: 316px;
+  display: flex;
+  gap: 60px;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #F5F5F5;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1B2E17;
+}
+
+.home           { width: 101px; }
+.dashboard      { width: 184px; left: 529px; }
+.issue-cert     { width: 195px; left: 825px; }
+.connect-wallet { width: 198px; left: 1132px; text-align: right; }
+
+/* Hero */
+.hero-bg {
+  width: 1440px;
+  height: 600px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: linear-gradient(rgba(30,60,40,0.6), rgba(30,60,40,0.6)),
+              url('../../assets/hero 1.png') center/cover no-repeat;
+}
+
+.hero-title {
+  width: 1343px;
+  left: 48px;
+  top: 189px;
+  position: absolute;
+  text-align: center;
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  width: 1026px;
+  left: 207px;
+  top: 292px;
+  position: absolute;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.hero-desc {
+  width: 872px;
+  left: 296px;
+  top: 378px;
+  position: absolute;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+/* Sections */
+.section-title {
+  width: 1026px;
+  left: 108px;
+  position: absolute;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.ca-info-title      { top: 761px; }
+.cert-dashboard-title { top: 1009px; }
+
+.ca-info-text {
+  width: 987px;
+  left: 108px;
+  top: 822px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* Visual cards & avatar */
+.cert-card-green {
+  width: 214px;
+  height: 247px;
+  left: 188px;
+  top: 1358px;
+  position: absolute;
+  background: rgba(133, 158, 106, 0.60);
+}
+
+.cert-card-white {
+  width: 215px;
+  height: 376px;
+  left: 402px;
+  top: 1229px;
+  position: absolute;
+  background: #F4EFE9;
+}
+
+.cert-avatar-outer,
+.cert-avatar-inner {
+  width: 390.37px;
+  height: 390.37px;
+  left: 836px;
+  top: 1095px;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.cert-avatar-outer { background: #F4EFE9; }
+.cert-avatar-inner { background: #A5695A; }
+
+/* Certificate table */
+.table-wrapper {
+  position: absolute;
+  left: 109px;
+  top: 1876px;
+  width: 1222px;
+  height: 384px;
+  background: #F4EFE9;
+}
+
+.cert-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  color: #1B2E17;
+}
+
+.cert-table th,
+.cert-table td {
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid black;
+  font-size: 24px;
+}
+
+.cert-table th {
+  font-weight: 600;
+  height: 67px;
+}
+
+.cert-table td {
+  font-weight: 400;
+  height: 80px;
+}
+
+/* Viền đậm giống gốc */
+.cert-table thead th,
+.cert-table tbody tr:last-child td {
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+.cert-table th:nth-child(1), .cert-table td:nth-child(1) { border-left: 3px solid black; }
+.cert-table th:nth-child(2), .cert-table td:nth-child(2) { border-left: 3px solid black; }
+.cert-table th:nth-child(3), .cert-table td:nth-child(3) { border-left: 3px solid black; }
+.cert-table th:nth-child(4), .cert-table td:nth-child(4) { border-left: 3px solid black; }
+.cert-table th:nth-child(5), .cert-table td:nth-child(5) { border-left: 3px solid black; border-right: 3px solid black; }
+
+/* Descriptions below table */
+.desc-left {
+  width: 600px;
+  left: 108px;
+  top: 1654px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.desc-right {
+  width: 498px;
+  left: 834px;
+  top: 1648px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* Footer */
+.footer-bg {
+  width: 1440px;
+  height: 250px;
+  position: absolute;
+  left: 0;
+  top: 2500px;
+  background: #1B2E17;
+}
+
+.footer-logo-bg {
+  width: 180px;
+  height: 180px;
+  position: absolute;
+  left: 107px;
+  top: 2520px;
+  background: #D9D9D9;
+}
+
+.logo-footer {
+  width: 178.97px;
+  height: 178.97px;
+  position: absolute;
+  left: 108px;
+  top: 2520px;
+}
+
+.footer-text {
+  position: absolute;
+  width: 430px;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.footer-text.left  { left: 409px; top: 2520px; }
+.footer-text.right { left: 939px; top: 2520px; }

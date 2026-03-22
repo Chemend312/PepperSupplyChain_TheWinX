@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Certificate - Certification Authority</title>
+  <link rel="stylesheet" href="../css/cert_02.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="page-container">
+
+  <!-- Header & Navbar -->
+  <header class="header">
+    <div class="header-bg"></div>
+    <div class="logo-placeholder"></div>
+    <img class="logo-main" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
+
+    <nav class="nav-menu">
+      <a href="cert_01.html" class="nav-item home">Home</a>
+      <a href="cert_01.html" class="nav-item dashboard">Dash Board</a>
+      <a href="cert_02.html" class="nav-item issue-cert active">Issue Certificate</a>
+      <a href="#" class="nav-item connect-wallet">Connect Wallet</a>
+    </nav>
+  </header>
+
+  <!-- Hero background -->
+  <div class="hero-bg"></div>
+
+  <!-- Hero texts -->
+  <h1 class="hero-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="hero-subtitle">CERTIFICATION AUTHORITY SITE</h2>
+  <p class="hero-desc">Manage Organic Certificate</p>
+
+  <!-- Issue Certificate title -->
+  <h3 class="section-title issue-title">ISSUE CERTIFICATE</h3>
+
+  <!-- Form fields -->
+  <div class="form-label farm-id">Farm ID:</div>
+  <input type="text" class="form-input farm-id-input" placeholder="Enter Farm ID">
+
+  <div class="form-label cert-file">Certificate File:</div>
+  <div class="file-upload-wrapper">
+    <input type="file" class="form-input cert-file-input" id="cert-file">
+    <button for="cert-file" class="upload-btn">Up load</button>
+  </div>
+
+  <!-- Issue button -->
+  <div class="btn-issue-bg"></div>
+  <div class="btn-issue-text">Issue Certificate</div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bg"></div>
+    <div class="footer-logo-placeholder"></div>
+    <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
+
+    <p class="footer-text left">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+    <p class="footer-text right">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+document.querySelector(".btn-issue-text").addEventListener("click", async () => {
+  const farmId = document.querySelector(".farm-id-input").value;
+  const fileInput = document.querySelector("#cert-file").files[0];
+
+  if (!farmId || !fileInput) {
+    alert("Vui lòng nhập Farm ID và chọn file chứng nhận!");
+    return;
+  }
+
+  // Tạo hash SHA-256 từ file chứng nhận
+  const buffer = await fileInput.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const certHash = "0x" + hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+  // Gửi API tới backend
+  try {
+    const res = await fetch("http://localhost:3000/certify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        farmId,
+        certHash,
+        validUntil: Math.floor(Date.now() / 1000) + 365*24*60*60 // 1 năm
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("Certificate issued! TxHash: " + data.txHash);
+    } else {
+      alert("Error: " + data.error);
+    }
+  } catch (err) {
+    alert("API call failed: " + err.message);
+  }
+});
+</script>
+
+</body>
+</html>

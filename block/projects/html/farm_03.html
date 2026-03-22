@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Batch - Farmer Site</title>
+  <link rel="stylesheet" href="../css/farm_03.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="page-container">
+
+  <!-- Header & Navbar -->
+  <header class="header">
+    <div class="header-bg"></div>
+    <div class="logo-placeholder"></div>
+    <img class="logo-main" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
+
+    <nav class="nav-menu">
+      <a href="main.html" class="nav-item home">Home</a>
+      <a href="farm_01.html" class="nav-item dashboard">Dash Board</a>
+      <a href="farm_02.html" class="nav-item create-batch">Create Batch</a>
+      <a href="farm_03.html" class="nav-item my-batch">My Batch</a>
+      <a href="#" class="nav-item connect-wallet">Hello Farmer</a>
+    </nav>
+  </header>
+
+  <!-- Hero background -->
+  <div class="hero-bg"></div>
+
+  <!-- Hero texts -->
+  <h1 class="hero-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="hero-subtitle">FARMER SITE</h2>
+  <p class="hero-desc">Create and manage your own batch</p>
+
+  <!-- My Batch title -->
+  <h3 class="section-title my-batch-title">MY BATCH:</h3>
+
+  <!-- Batch list table -->
+  <div class="table-wrapper">
+    <table class="batch-table">
+      <thead>
+        <tr>
+          <th>Batch ID</th>
+          <th>Harvest Date</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DL0001</td>
+          <td>2026-02-12</td>
+          <td>5000</td>
+          <td>Done</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>DL0002</td>
+          <td>2026-02-13</td>
+          <td>2000</td>
+          <td>Done</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>DL0003</td>
+          <td>2026-02-14</td>
+          <td>10000</td>
+          <td>Done</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>DL0004</td>
+          <td>2026-02-15</td>
+          <td>8000</td>
+          <td>Done</td>
+          <td>XXX</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Detail Batch title -->
+  <h3 class="section-title detail-title">DETAIL BATCH:</h3>
+
+  <!-- Detail fields -->
+  <div class="detail-label farm-id">Farm ID:</div>
+  <div class="detail-value farm-id">XXXXXXXX</div>
+
+  <div class="detail-label batch-id">Batch ID:</div>
+  <div class="detail-value batch-id">XXXXXXXX</div>
+
+  <div class="detail-label quantity">Quantity (kg):</div>
+  <div class="detail-value quantity">XXXX</div>
+
+  <div class="detail-label create-at">Create at:</div>
+  <div class="detail-value create-at">XX/YY/ZZ</div>
+
+  <div class="detail-label done-at">Done at:</div>
+  <div class="detail-value done-at">XX/YY/ZZ</div>
+
+  <div class="detail-label distributor">Distributor:</div>
+  <div class="detail-value distributor">XXXXXXX</div>
+
+  <div class="detail-label retailer">Retailer:</div>
+  <div class="detail-value retailer">XXXXXXX</div>
+
+  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
+
+  <div class="detail-label status">Status:</div>
+  <div class="detail-value status">XXXXXXXXXXXXXX</div>
+
+  <img class="qr-detail" src="../../assets/image 2.png" alt="QR Code">
+
+  <!-- QR Download button -->
+  <div class="btn-qr-bg"></div>
+  <div class="btn-qr-text">QR Down load</div>
+
+  <!-- Vertical divider in detail -->
+  <div class="vertical-divider-detail"></div>
+  <!-- Timeline -->
+<div class="timeline">
+  <div class="timeline-line"></div>
+  <div class="timeline-arrow"></div>
+
+</div>
+
+<!-- Image grid -->
+<div class="image-grid">
+  <img src="../../assets/1 1.png">
+  <img src="../../assets/1 1.png">
+  <img src="../../assets/1 1.png">
+  <img src="../../assets/1 1.png">
+  <img src="../../assets/1 1.png">
+  <img src="../../assets/1 1.png">
+</div>
+
+  <!-- Status indicators -->
+  <div class="status-indicator left">XXX</div>
+  <div class="status-indicator middle">XXX</div>
+  <div class="status-indicator right">XXX</div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bg"></div>
+    <div class="footer-logo-placeholder"></div>
+    <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
+
+    <p class="footer-text left">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+    <p class="footer-text right">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+async function loadMyBatches() {
+  const tableBody = document.querySelector(".batch-table tbody");
+  tableBody.innerHTML = "";
+
+  // Giả sử bạn có danh sách batch ID của farmer này
+  const batchIds = ["DL0001", "DL0002", "DL0003", "DL0004"];
+
+  const statusMap = ["Created", "Processing", "Shipped", "Sold"];
+
+  for (const id of batchIds) {
+    try {
+      const res = await fetch(`http://localhost:3000/lot/${id}`);
+      const lot = await res.json();
+
+      const createdAt = new Date(lot.createdAt * 1000).toISOString().split("T")[0];
+      const statusText = statusMap[lot.status] || lot.status;
+
+      const row = `
+        <tr onclick="viewDetail('${id}')">
+          <td>${lot.id}</td>
+          <td>${createdAt}</td>
+          <td>${lot.initialWeight}</td>
+          <td>${statusText}</td>
+          <td>-</td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML("beforeend", row);
+    } catch (err) {
+      console.error("Không load được batch", id, err);
+    }
+  }
+}
+
+async function viewDetail(batchId) {
+  try {
+    const res = await fetch(`http://localhost:3000/lot/${batchId}`);
+    const lot = await res.json();
+
+    document.querySelector(".detail-value.farm-id").textContent = lot.farmId;
+    document.querySelector(".detail-value.batch-id").textContent = lot.id;
+    document.querySelector(".detail-value.quantity").textContent = lot.initialWeight;
+    document.querySelector(".detail-value.create-at").textContent = new Date(lot.createdAt * 1000).toLocaleDateString();
+    document.querySelector(".detail-value.done-at").textContent = new Date(lot.updatedAt * 1000).toLocaleDateString();
+
+    // Distributor & Retailer (tạm thời hiển thị owner)
+    document.querySelector(".detail-value.distributor").textContent = lot.owner;
+    document.querySelector(".detail-value.retailer").textContent = "N/A";
+
+    // Lấy certHash từ farm
+    try {
+      const farmRes = await fetch(`http://localhost:3000/farm/${lot.farmId}`);
+      const farm = await farmRes.json();
+      document.querySelector(".detail-value.cert-hash").textContent = farm.certHash;
+    } catch (err) {
+      document.querySelector(".detail-value.cert-hash").textContent = "-";
+    }
+
+    // Map status
+    const statusMap = ["Created", "Processing", "Shipped", "Sold"];
+    document.querySelector(".detail-value.status").textContent = statusMap[lot.status] || lot.status;
+
+    // Tạo QR code cho batch
+    generateQRCode(batchId);
+  } catch (err) {
+    alert("Không lấy được chi tiết batch: " + err.message);
+  }
+}
+
+// Hàm tạo QR code đơn giản
+function generateQRCode(batchId) {
+  const qrCanvas = document.createElement("canvas");
+  qrCanvas.width = 200;
+  qrCanvas.height = 200;
+  const ctx = qrCanvas.getContext("2d");
+  ctx.fillStyle = "#000";
+  ctx.font = "16px Arial";
+  ctx.fillText("Batch: " + batchId, 20, 100);
+
+  document.querySelector(".qr-detail").replaceWith(qrCanvas);
+
+  // Nút tải QR
+  document.querySelector(".btn-qr-text").addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = `QR_${batchId}.png`;
+    link.href = qrCanvas.toDataURL();
+    link.click();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadMyBatches);
+</script>
+
+</body>
+</html>

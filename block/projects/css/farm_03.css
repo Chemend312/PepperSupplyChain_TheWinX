@@ -1,0 +1,385 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.page-container {
+  width: 1440px;
+  min-height: 2255px;
+  position: relative;
+  background: rgba(27, 46, 23, 0.80);
+  overflow: visible;
+  margin: 0 auto;
+  color: #F4EFE9;
+}
+
+/* Header & Navbar (giống các trang trước) */
+.header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1440px;
+  height: 80px;
+  z-index: 10;
+}
+
+.header-bg {
+  width: 100%;
+  height: 100%;
+  background: #1B2E17;
+}
+
+.logo-placeholder {
+  width: 70px;
+  height: 70px;
+  left: 108px;
+  top: 5px;
+  position: absolute;
+  background: #D9D9D9;
+}
+
+.logo-main {
+  width: 66.01px;
+  height: 66.01px;
+  left: 110px;
+  top: 7.03px;
+  position: absolute;
+}
+
+.nav-menu {
+  position: absolute;
+  top: 25px;
+  left: 316px;
+  display: flex;
+  gap: 40px;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #F5F5F5;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1B2E17;
+}
+
+.home           { width: 101px; }
+.dashboard      { width: 184px; }
+.create-batch   { width: 195px; }
+.my-batch       { width: 129px; }
+.connect-wallet { width: 198px; text-align: right; }
+
+/* Hero */
+.hero-bg {
+  width: 1440px;
+  height: 600px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: linear-gradient(rgba(30,60,40,0.6), rgba(30,60,40,0.6)),
+              url('../../assets/f.png') center/cover no-repeat;
+}
+
+.hero-title {
+  width: 1343px;
+  left: 48px;
+  top: 189px;
+  position: absolute;
+  text-align: center;
+  font-size: 48px;
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  width: 1026px;
+  left: 207px;
+  top: 292px;
+  position: absolute;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.hero-desc {
+  width: 872px;
+  left: 296px;
+  top: 378px;
+  position: absolute;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 500;
+}
+.timeline {
+  position: absolute;
+  left: 650px;
+  top: 1320px;
+  width: 700px;
+  height: 100px;
+}
+
+/* Line */
+.timeline-line {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 600px;
+  height: 3px;
+  background: #F4EFE9;
+}
+
+/* Arrow */
+.timeline-arrow {
+  position: absolute;
+  top: 33px;
+  left: 600px;
+  width: 0;
+  height: 0;
+  border-left: 15px solid #F4EFE9;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+/* Steps */
+.timeline-step {
+  position: absolute;
+  top: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* tam giác nhỏ dưới step */
+.timeline-step::after {
+  content: "";
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid #F4EFE9;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+/* vị trí từng step */
+.step-1 { left: 80px; }
+.step-2 { left: 280px; }
+.step-3 { left: 480px; }
+/* Section titles */
+.section-title {
+  width: 1026px;
+  left: 108px;
+  position: absolute;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.my-batch-title { top: 725px; }
+.detail-title   { top: 1222px; }
+
+/* Table My Batch */
+.table-wrapper {
+  position: absolute;
+  left: 108px;
+  top: 793px;
+  width: 1222px;
+  height: 384px;
+  background: #F4EFE9;
+}
+
+.batch-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  color: #1B2E17;
+}
+
+.batch-table th,
+.batch-table td {
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid black;
+  font-size: 24px;
+}
+
+.batch-table th {
+  font-weight: 600;
+  height: 67px; /* khoảng cách header */
+}
+
+.batch-table td {
+  font-weight: 400;
+  height: 80px;
+}
+
+/* Viền đậm giống gốc */
+.batch-table thead th,
+.batch-table tbody tr:last-child td {
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+.batch-table th:nth-child(1), .batch-table td:nth-child(1) { border-left: 3px solid black; }
+.batch-table th:nth-child(2), .batch-table td:nth-child(2) { border-left: 3px solid black; }
+.batch-table th:nth-child(3), .batch-table td:nth-child(3) { border-left: 3px solid black; }
+.batch-table th:nth-child(4), .batch-table td:nth-child(4) { border-left: 3px solid black; }
+.batch-table th:nth-child(5), .batch-table td:nth-child(5) { border-left: 3px solid black; border-right: 3px solid black; }
+
+/* Detail Batch */
+.detail-label {
+  left: 108px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F4EFE9;
+}
+
+.detail-label.farm-id     { top: 1290px; }
+.detail-label.batch-id    { top: 1364px; }
+.detail-label.quantity    { top: 1438px; }
+.detail-label.create-at   { top: 1512px; }
+.detail-label.done-at     { top: 1586px; }
+.detail-label.distributor { top: 1660px; }
+.detail-label.retailer    { top: 1734px; }
+.detail-label.cert-hash   { top: 1808px; }
+.detail-label.status      { top: 1882px; }
+
+.detail-value {
+  left: 316px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 400;
+  color: #F4EFE9;
+}
+
+.detail-value.farm-id     { top: 1290px; width: 171px; }
+.detail-value.batch-id    { top: 1364px; width: 284px; }
+.detail-value.quantity    { top: 1438px; width: 288px; }
+.detail-value.create-at   { top: 1512px; width: 231px; }
+.detail-value.done-at     { top: 1586px; width: 231px; }
+.detail-value.distributor { top: 1660px; width: 231px; }
+.detail-value.retailer    { top: 1734px; width: 231px; }
+.detail-value.cert-hash   { top: 1808px; width: 231px; }
+.detail-value.status      { top: 1882px; width: 231px; }
+
+/* Vertical divider in detail */
+.vertical-divider-detail {
+  width: 654px;
+  height: 0;
+  left: 600px;
+  top: 1257px;
+  position: absolute;
+  transform: rotate(90deg);
+  transform-origin: top left;
+  outline: 1px solid white;
+  outline-offset: -0.5px;
+}
+
+/* Status indicators */
+.status-indicator {
+  position: absolute;
+  text-align: center;
+  color: #F4EFE9;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.status-indicator.left   { left: 713px; top: 1406px; }
+.status-indicator.middle { left: 898px; top: 1298px; }
+.status-indicator.right  { left: 1025px; top: 1406px; }
+
+.image-grid {
+  position: absolute;
+  left: 650px;
+  top: 1450px;
+  display: grid;
+  grid-template-columns: repeat(3, 184px);
+  grid-gap: 24px;
+}
+
+.image-grid img {
+  width: 184px;
+  height: 115px;
+  object-fit: cover;
+}
+
+/* QR detail */
+.qr-detail {
+  width: 121px;
+  height: 121px;
+  left: 628px;
+  top: 1784px;
+  position: absolute;
+}
+
+/* QR Download button */
+.btn-qr-bg {
+  width: 178.04px;
+  height: 60px;
+  left: 813.48px;
+  top: 1851px;
+  position: absolute;
+  background: #859E6A;
+  border-radius: 10px;
+}
+
+.btn-qr-text {
+  left: 798px;
+  top: 1866px;
+  position: absolute;
+  color: rgba(244, 239, 233, 0.80);
+  font-size: 24px;
+  font-weight: 500;
+  text-align: center;
+  width: 209px;
+}
+
+/* Footer */
+.footer-bg {
+  width: 1440px;
+  height: 250px;
+  left: 0;
+  top: 2200px;
+  position: absolute;
+  background: #1B2E17;
+}
+
+.footer-logo-placeholder {
+  width: 180px;
+  height: 180px;
+  left: 108px;
+  top: 2220px;
+  position: absolute;
+  background: #D9D9D9;
+}
+
+.logo-footer {
+  width: 178.97px;
+  height: 178.97px;
+  left: 108px;
+  top: 2220px;
+  position: absolute;
+}
+
+.footer-text {
+  width: 430px;
+  position: absolute;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #F4EFE9;
+}
+
+.footer-text.left  { left: 410px; top: 2220px; }
+.footer-text.right { left: 940px; top: 2220px; }

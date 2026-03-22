@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certification Authority - Traceable Organic Pepper</title>
+  <link rel="stylesheet" href="../css/cert_01.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<script>
+async function loadCertificates() {
+  const tableBody = document.querySelector(".cert-table tbody");
+  tableBody.innerHTML = ""; // clear bảng cũ
+
+  // Giả sử bạn có danh sách farm ID cần hiển thị
+  const farmIds = ["F0001", "F0002", "F0003", "F0004"];
+
+  for (const farmId of farmIds) {
+    const res = await fetch(`http://localhost:3000/farm/${farmId}`);
+    const farm = await res.json();
+
+    // farm.certHash, farm.validUntil, farm.certified lấy từ contract
+    const issueDate = new Date(farm.validUntil * 1000).toISOString().split("T")[0];
+
+    const row = `
+      <tr>
+        <td>${farmId}</td>
+        <td>${farm.certHash}</td>
+        <td>${issueDate}</td>
+        <td>${farm.certified ? "Organic" : "Pending"}</td>
+        <td>-</td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", row);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadCertificates);
+</script>
+
+<body>
+
+<div class="page-container">
+
+  <!-- Header & Navbar -->
+  <header class="header">
+    <div class="header-bg"></div>
+    <div class="logo-placeholder"></div>
+    <img class="logo-main" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
+
+    <nav class="nav-menu">
+      <a href="cert_01.html" class="nav-item home">Home</a>
+      <a href="cert_01.html" class="nav-item dashboard">Dash Board</a>
+      <a href="cert_02.html" class="nav-item issue-cert">Issue Certificate</a>
+      <a href="#" class="nav-item connect-wallet">Connect Wallet</a>
+    </nav>
+  </header>
+
+  <!-- Hero background -->
+  <div class="hero-bg"></div>
+
+  <!-- Hero texts -->
+  <h1 class="hero-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="hero-subtitle">CERTIFICATION AUTHORITY SITE</h2>
+  <p class="hero-desc">Manage Organic Certificate</p>
+
+  <!-- CA Information -->
+  <h3 class="section-title ca-info-title">CERTIFICATION AUTHORITY INFORMATION:</h3>
+  <p class="ca-info-text">
+    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
+    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
+    Cras laoreet sem ac massa tincidunt varius.<br>
+    Pellentesque eleifend risus quis massa vestibulum pulvinar.<br>
+    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
+  </p>
+
+  <!-- Certificate Dashboard title -->
+  <h3 class="section-title cert-dashboard-title">CERTIFICATE DASHBOARD:</h3>
+
+  <!-- Visual elements (card & avatar) -->
+  <div class="cert-card-green"></div>
+  <div class="cert-card-white"></div>
+  <div class="cert-avatar-outer"></div>
+  <div class="cert-avatar-inner"></div>
+
+  <!-- Certificate table -->
+  <div class="table-wrapper">
+    <table class="cert-table">
+      <thead>
+        <tr>
+          <th>Farm ID</th>
+          <th>Certificate Hash</th>
+          <th>Issue Date</th>
+          <th>Type of certificate</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>F0001</td>
+          <td>XXXXXXXX</td>
+          <td>2026-02-10</td>
+          <td>X</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>F0002</td>
+          <td>XXXXXXXX</td>
+          <td>2026-02-10</td>
+          <td>Y</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>F0003</td>
+          <td>XXXXXXXX</td>
+          <td>2026-02-10</td>
+          <td>Z</td>
+          <td>XXX</td>
+        </tr>
+        <tr>
+          <td>F0004</td>
+          <td>XXXXXXXX</td>
+          <td>2026-02-10</td>
+          <td>A</td>
+          <td>XXX</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Descriptions below table -->
+  <p class="desc-left">
+    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
+    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
+    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
+  </p>
+  <p class="desc-right">
+    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
+    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
+    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
+  </p>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bg"></div>
+    <div class="footer-logo-placeholder"></div>
+    <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
+
+    <p class="footer-text left">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+    <p class="footer-text right">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trace Product</title>
+  <link rel="stylesheet" href="../css/cont.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header-bg"></div>
+
+  <a href="main.html" class="nav home">Home</a>
+  <a href="main.html#supply-chain" class="nav supply">Supply Chain</a>
+  <a href="#" class="nav trace">Trace Product</a>
+  <a href="main.html#about" class="nav about">About</a>
+  <a href="main.html#connect-wallet" class="nav wallet">Connect Wallet</a>
+
+  <div class="logo-bg"></div>
+  <img class="logo-small" src="../../assets/logo-removebg-preview 1.png" alt="">
+  <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="">
+
+  <div class="hero-bg"></div>
+
+  <h1 class="title-main">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="title-trace">TRACE YOUR PRODUCT</h2>
+
+  <div class="instruction">Enter Batch ID or scan QR code to view the product's supply chain history.</div>
+
+  <div class="batch-label">Batch ID:</div>
+  <input type="text" class="batch-input">
+
+  <div class="divider-vertical"></div>
+
+  <h3 class="section-title left">TRACE YOUR PRODUCT:</h3>
+  <h3 class="section-title right">INFORMATION:</h3>
+
+  <div class="info-text">Vivamus vehicula sapien sit amet enim finibus vulputate.<br>Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>Cras laoreet sem ac massa tincidunt varius.<br>Pellentesque eleifend risus quis massa vestibulum pulvinar.<br>Mauris id nisi euismod, ullamcorper metus nec, dictum odio.</div>
+
+  <img class="scan-icon" src="../../assets/Scan Stock.png" alt="Scan">
+  <img class="qr-example" src="../../assets/image 2.png" alt="QR">
+
+  <div class="btn-scan-bg"></div>
+  <div class="btn-scan-text">Scan QR</div>
+
+  <div class="footer-bg"></div>
+  <div class="footer-logo-bg"></div>
+
+  <div class="footer-text left">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+    Proin pharetra augue vel ornare interdum.
+  </div>
+
+  <div class="footer-text right">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+    Proin pharetra augue vel ornare interdum.
+  </div>
+
+</div>
+
+<script>
+document.querySelector(".btn-scan-text").addEventListener("click", async () => {
+  const batchId = document.querySelector(".batch-input").value;
+  if (!batchId) {
+    alert("⚠️ Vui lòng nhập Batch ID hoặc quét QR!");
+    return;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:3000/lot/${batchId}`);
+    const lot = await res.json();
+
+    // Hiển thị thông tin batch
+    alert(`
+📋 Batch ${lot.id}
+Farm ID: ${lot.farmId}
+Farmer: ${lot.farmer}
+Owner: ${lot.owner}
+Initial Weight: ${lot.initialWeight} kg
+Processed Weight: ${lot.processedWeight} kg
+Created At: ${new Date(lot.createdAt * 1000).toLocaleDateString()}
+Updated At: ${new Date(lot.updatedAt * 1000).toLocaleDateString()}
+Status: ${lot.status}
+Flagged: ${lot.flagged ? "Yes" : "No"}
+    `);
+  } catch (err) {
+    alert("❌ Không tìm thấy batch: " + err.message);
+  }
+});
+</script>
+
+</body>
+</html>

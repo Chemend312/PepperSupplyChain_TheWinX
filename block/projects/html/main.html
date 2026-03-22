@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Traceable Organic Pepper</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="../js/connect.js"></script>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Header / Navbar -->
+  <header class="header">
+    <div class="logo-placeholder"></div>
+    <img class="logo" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
+
+    <nav class="nav-menu">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#supply-chain" class="nav-link">Supply Chain</a>
+      <a href="cont.html" class="nav-link">Trace Product</a>
+      <a href="#about" class="nav-link">About</a>
+      <a id="connectWalletBtn" class="nav-link connect-wallet" >Connect Wallet</a>
+    </nav>
+  </header>
+
+  <!-- Hero section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <h1 class="hero-main-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+    <h2 class="hero-subtitle">Blockchain-powered transparency for organic pepper production and distribution</h2>
+    
+    <div class="hero-buttons">
+      <a href="cont.html" class="btn btn-primary">Trace product</a>
+      <a href="#" class="btn btn-primary">Learn more</a>
+    </div>
+  </section>
+
+  <!-- Content sections -->
+  <section class="content-block content-block--two-columns">
+    <div class="content-left">
+      <h3 id="supply-chain">Traceable Organic Pepper Supply Chain</h3>
+      <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters...</p>
+      
+      <div class="small-buttons">
+        <a href="cont.html" class="btn btn-small">Trace product</a>
+        <a href="#" class="btn btn-small">Connect Wallet</a>
+      </div>
+    </div>
+
+    <div class="content-right">
+      <img src="../../assets/1 1.png" alt="Pepper product" class="content-image content-image--right">
+    </div>
+  </section>
+
+  <section class="content-block content-block--reverse">
+    <div class="content-left">
+      <img src="../../assets/image 1.png" alt="About image" class="content-image content-image--left">
+    </div>
+
+    <div class="content-right">
+      <h3 id="about">About Us</h3>
+      <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters... Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text...</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo-placeholder"></div>
+    <img class="footer-logo" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
+
+    <div class="footer-text">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>Proin pharetra augue vel ornare interdum.</p>
+    </div>
+
+    <div class="footer-text">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>Proin pharetra augue vel ornare interdum.</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+async function connectWallet() {
+  if (typeof window.ethereum !== "undefined") {
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const account = accounts[0];
+      alert("✅ Wallet connected: " + account);
+
+      // Hiển thị tên ví trên navbar
+      document.getElementById("connectWalletBtn").textContent = account.substring(0,6) + "..." + account.slice(-4);
+    } catch (err) {
+      alert("❌ Kết nối ví thất bại: " + err.message);
+    }
+  } else {
+    alert("⚠️ Vui lòng cài MetaMask hoặc ví Ethereum!");
+  }
+}
+
+document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
+</script>
+
+</body>
+</html>

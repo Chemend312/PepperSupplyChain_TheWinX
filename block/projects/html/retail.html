@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retail Dashboard - Traceable Organic Pepper</title>
+  <link rel="stylesheet" href="../css/retail.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .btn-buy {
+      background: #859E6A;
+      color: white;
+      border: none;
+      padding: 8px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .btn-buy:hover {
+      background: #6f8a57;
+    }
+
+    .status-select {
+      width: 100%;
+      padding: 8px;
+      font-size: 22px;
+      text-align: center;
+      border: 1px solid #000;
+      background: #F4EFE9;
+      border-radius: 4px;
+    }
+
+    .btn-view {
+      background: #1B2E17;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-container">
+
+  <!-- Header & Navbar -->
+  <header class="header">
+    <div class="header-bg"></div>
+    <div class="logo-placeholder"></div>
+    <img class="logo-main" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
+
+    <nav class="nav-menu">
+      <a href="main.html" class="nav-item home">Home</a>
+      <a href="distribution.html" class="nav-item dashboard">Dash Board</a>
+      <a href="#my-inventory" class="nav-item batch-processing">Batch Processing</a>
+      <a href="#" class="nav-item connect-wallet">Hello Retailer</a>
+    </nav>
+  </header>
+
+  <!-- Hero background -->
+  <div class="hero-bg"></div>
+
+  <!-- Hero texts -->
+  <h1 class="hero-title">TRACEABLE ORGANIC PEPPER SUPPLY CHAIN</h1>
+  <h2 class="hero-subtitle">RETAILER SITE</h2>
+  <p class="hero-desc">Manage Organic Certificate</p>
+
+  <!-- AVAILABLE BATCHES -->
+  <h3 class="section-title available-title">AVAILABLE BATCHES:</h3>
+  <div class="table-wrapper available-table">
+    <table class="batch-table" id="availableTable">
+      <thead>
+        <tr>
+          <th>Batch ID</th>
+          <th>Farm ID</th>
+          <th>Quantity</th>
+          <th>Harvest Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-batch-id="DL0001">
+          <td>DL0001</td>
+          <td>F0001</td>
+          <td>5000</td>
+          <td>2026-02-10</td>
+          <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
+        </tr>
+        <tr data-batch-id="DL0002">
+          <td>DL0002</td>
+          <td>F0002</td>
+          <td>2000</td>
+          <td>2026-02-10</td>
+          <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
+        </tr>
+        <tr data-batch-id="DL0003">
+          <td>DL0003</td>
+          <td>F0003</td>
+          <td>10000</td>
+          <td>2026-02-10</td>
+          <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
+        </tr>
+        <tr data-batch-id="DL0004">
+          <td>DL0004</td>
+          <td>F0004</td>
+          <td>8000</td>
+          <td>2026-02-10</td>
+          <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MY INVENTORY -->
+  <h3 class="section-title my-batches-title" id="my-inventory">MY INVENTORY:</h3>
+  <div class="table-wrapper my-table">
+    <table class="batch-table" id="myInventoryTable">
+      <thead>
+        <tr>
+          <th>Batch ID</th>
+          <th>Farm ID</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="myInventoryBody">
+        <!-- JS sẽ thêm dữ liệu mẫu + dữ liệu mua vào đây -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DETAIL -->
+  <h3 class="section-title detail-title">DETAIL:</h3>
+  <div class="detail-label farm-id">Farm ID:</div>
+  <div class="detail-value farm-id">XXXXXXXX</div>
+
+  <div class="detail-label batch-id">Batch ID</div>
+  <div class="detail-value batch-id">XXXXXXXX</div>
+
+  <div class="detail-label quantity">Quantity (kg):</div>
+  <div class="detail-value quantity">XXXX</div>
+
+  <div class="detail-label create-at">Create at:</div>
+  <div class="detail-value create-at">XX/YY/ZZ</div>
+
+  <div class="detail-label done-at">Done at:</div>
+  <div class="detail-value done-at">XX/YY/ZZ</div>
+
+  <div class="detail-label current-owner">Current Owner:</div>
+  <div class="detail-value current-owner">XXXXXXX</div>
+
+  <div class="detail-label retailer">Retailer:</div>
+  <div class="detail-value retailer">XXXXXXX</div>
+
+  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
+
+  <div class="detail-label status">Status:</div>
+  <div class="detail-value status">XXXXXXXXXXXXXX</div>
+
+  <div class="detail-label view-cert">View certificate</div>
+
+  <button class="btn-open-cert">Open Cert</button>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bg"></div>
+    <div class="footer-logo-placeholder"></div>
+    <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
+
+    <p class="footer-text left">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+    <p class="footer-text right">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
+      Proin pharetra augue vel ornare interdum.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+const statusMap = ["Created", "Processing", "Shipped", "Sold"];
+
+// Load dữ liệu mẫu khi trang load
+document.addEventListener("DOMContentLoaded", () => {
+  const tbody = document.getElementById("myInventoryBody");
+  myInventory.forEach(item => {
+    addToMyInventory(item.id, item.farm, item.qty, item.status);
+  });
+
+  // Thêm nút Sell Batch dưới nút Open Cert
+  document.querySelector(".btn-open-cert").insertAdjacentHTML(
+    "afterend",
+    '<button class="btn-sell">Sell Batch</button>'
+  );
+
+  document.querySelector(".btn-sell").addEventListener("click", sellBatch);
+});
+
+// Hàm mua batch
+async function buyBatch(btn) {
+  const row = btn.parentElement.parentElement;
+  const batchId = row.getAttribute("data-batch-id");
+  const farmId = row.cells[1].textContent;
+  const quantity = row.cells[2].textContent;
+
+  if (confirm(`Xác nhận mua Batch ${batchId} (${quantity} kg)?`)) {
+    try {
+      const res = await fetch(`http://localhost:3000/lot/${batchId}/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: "1000000000000000000" }) // ví dụ gửi 1 ETH
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        row.remove(); // Xóa khỏi Available
+        addToMyInventory(batchId, farmId, quantity, "Processing");
+        alert(`✅ Đã mua thành công Batch ${batchId}! TxHash: ${data.txHash}`);
+      } else {
+        alert("❌ Lỗi: " + data.error);
+      }
+    } catch (err) {
+      alert("API call failed: " + err.message);
+    }
+  }
+}
+
+// Thêm batch vào bảng MY INVENTORY
+function addToMyInventory(batchId, farmId, quantity, status) {
+  const tbody = document.getElementById("myInventoryBody");
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${batchId}</td>
+    <td>${farmId}</td>
+    <td>${quantity}</td>
+    <td>${status}</td>
+    <td><button class="btn-view" onclick="viewDetail('${batchId}')">View</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+// Xem chi tiết batch
+async function viewDetail(batchId) {
+  try {
+    const res = await fetch(`http://localhost:3000/lot/${batchId}`);
+    const lot = await res.json();
+
+    document.querySelector(".detail-value.farm-id").textContent = lot.farmId;
+    document.querySelector(".detail-value.batch-id").textContent = lot.id;
+    document.querySelector(".detail-value.quantity").textContent = lot.initialWeight;
+    document.querySelector(".detail-value.create-at").textContent = new Date(lot.createdAt * 1000).toLocaleDateString();
+    document.querySelector(".detail-value.done-at").textContent = new Date(lot.updatedAt * 1000).toLocaleDateString();
+    document.querySelector(".detail-value.current-owner").textContent = lot.owner;
+    document.querySelector(".detail-value.retailer").textContent = "Retailer";
+
+    // Lấy certHash từ farm
+    try {
+      const farmRes = await fetch(`http://localhost:3000/farm/${lot.farmId}`);
+      const farm = await farmRes.json();
+      document.querySelector(".detail-value.cert-hash").textContent = farm.certHash;
+    } catch (err) {
+      document.querySelector(".detail-value.cert-hash").textContent = "-";
+    }
+
+    // Map status enum
+    document.querySelector(".detail-value.status").textContent = statusMap[lot.status] || lot.status;
+  } catch (err) {
+    alert("Không lấy được chi tiết batch: " + err.message);
+  }
+}
+
+// Bán batch cho người tiêu dùng cuối
+async function sellBatch() {
+  const batchId = document.querySelector(".detail-value.batch-id").textContent;
+
+  if (!batchId || batchId === "XXXXXXXX") {
+    alert("⚠️ Vui lòng chọn batch trước khi bán!");
+    return;
+  }
+
+  if (confirm(`Xác nhận bán Batch ${batchId} cho người tiêu dùng cuối?`)) {
+    try {
+      const res = await fetch(`http://localhost:3000/lot/${batchId}/sell`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`✅ Batch ${batchId} đã được bán! TxHash: ${data.txHash}`);
+        document.querySelector(".detail-value.status").textContent = "Sold";
+      } else {
+        alert("❌ Lỗi: " + data.error);
+      }
+    } catch (err) {
+      alert("API call failed: " + err.message);
+    }
+  }
+}
+
+// Mở chứng nhận từ hash
+document.querySelector(".btn-open-cert").addEventListener("click", () => {
+  const certHash = document.querySelector(".detail-value.cert-hash").textContent;
+  if (!certHash || certHash === "XXXXXXXXXXXXXX") {
+    alert("⚠️ Không có chứng nhận để mở!");
+    return;
+  }
+  alert(`📄 Mở chứng nhận với hash: ${certHash}`);
+});
+</script>
+</body>
+</html>
