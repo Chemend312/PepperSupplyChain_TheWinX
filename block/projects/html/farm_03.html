@@ -104,10 +104,7 @@
   <div class="detail-label distributor">Distributor:</div>
   <div class="detail-value distributor">XXXXXXX</div>
 
-  <div class="detail-label retailer">Retailer:</div>
-  <div class="detail-value retailer">XXXXXXX</div>
-
-  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-label cert-hash">Cert:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
@@ -148,16 +145,18 @@
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
@@ -219,10 +218,9 @@ async function viewDetail(batchId) {
 
     // Địa chỉ ví người sở hữu hiện tại
     document.querySelector(".detail-value.distributor").textContent = lot.users ? lot.users.wallet_address.substring(0,8) + "..." : "N/A";
-    document.querySelector(".detail-value.retailer").textContent = "N/A";
 
     // Trích xuất Cert Hash
-    let certHash = "Chưa có chứng nhận";
+    let certHash = "Đã có chứng nhận";
     if (lot.farms && lot.farms.certifications && lot.farms.certifications.length > 0) {
         certHash = lot.farms.certifications[0].cert_hash;
     }

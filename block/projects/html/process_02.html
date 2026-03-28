@@ -100,17 +100,20 @@
   <div class="detail-label done-at">Done at:</div>
   <div class="detail-value done-at">XX/YY/ZZ</div>
 
-  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-label cert-hash">Cert:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
-  <div class="detail-label view-cert">View certificate</div>
-  <button class="btn-open-cert">Open Cert</button>
 
-  <div class="detail-label change-status">Change Status</div>
-  <input type="text" class="status-input" placeholder="Enter new status">
+<div class="detail-label change-status">Change Status</div>
+<div class="detail-label change-price">Price: </div>
 
-  <div class="detail-label note">Note:</div>
-  <textarea class="note-textarea">XXXXXXXXXXXXXX</textarea>
+<select class="status-select">
+  <option value="PROCESSING">Processing</option>
+  <option value="PROCESSED">Processed</option>
+</select>
+<div class="detail-label">Price (ETH):</div>
+
+<input type="number" class="price-input" placeholder="Nhập giá...">
 
   <button class="btn-confirm">Confirm</button>
 
@@ -119,107 +122,204 @@
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
+
+<script src="../js/abi.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="../js/connect.js"></script>
 <script>
 const API_URL = "http://localhost:3001/api";
 
-// 1. Tải danh sách lô hàng của nhà máy
+/* =========================
+   CONNECT WALLET
+========================= */
+async function ensureWallet() {
+  let contract = window.getContract();
+
+  if (!contract) {
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    contract = window.getContract();
+  }
+
+  return contract;
+}
+
+/* =========================
+   LOAD MY BATCHES
+========================= */
 async function loadMyBatches() {
-    const tbody = document.querySelector(".my-batches-table tbody");
-    const wallet = localStorage.getItem("connectedWallet");
-    if (!wallet) return;
+  const tbody = document.querySelector(".my-batches-table tbody");
+  const wallet = localStorage.getItem("connectedWallet");
 
-    tbody.innerHTML = "<tr><td colspan='5'>⏳ Đang tải...</td></tr>";
+  if (!wallet) {
+    tbody.innerHTML = "<tr><td colspan='5'>⚠️ Chưa connect wallet</td></tr>";
+    return;
+  }
 
-    try {
-        const res = await fetch(`${API_URL}/my-batches/${wallet}`);
-        const result = await res.json();
-        tbody.innerHTML = "";
+  try {
+    const res = await fetch(`${API_URL}/my-batches/${wallet}`);
+    const result = await res.json();
 
-        result.data.forEach(lot => {
-            const row = `
-                <tr style="cursor: pointer;" onclick="viewDetail('${lot.chain_batch_id}')">
-                    <td><strong>${lot.chain_batch_id}</strong></td>
-                    <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.processed_weight || lot.initial_weight}</td>
-                    <td><span style="color:#27ae60; font-weight:bold;">${lot.status}</span></td>
-                    <td><button class="btn-view">View</button></td>
-                </tr>`;
-            tbody.insertAdjacentHTML("beforeend", row);
-        });
-    } catch (e) { console.error(e); }
-}
+    tbody.innerHTML = "";
 
-// 2. Xem chi tiết lô hàng
-async function viewDetail(batchId) {
-    try {
-        const res = await fetch(`${API_URL}/trace/${batchId}`);
-        const result = await res.json();
-        if(!result.success) throw new Error(result.message);
-
-        const lot = result.data;
-        document.querySelector(".detail-value.farm-id").textContent = lot.farms?.chain_farm_id;
-        document.querySelector(".detail-value.batch-id").textContent = lot.chain_batch_id;
-        document.querySelector(".detail-value.quantity").textContent = (lot.processed_weight || lot.initial_weight) + " kg";
-        document.querySelector(".detail-value.create-at").textContent = new Date(lot.created_at).toLocaleDateString();
-        document.querySelector(".detail-value.done-at").textContent = lot.updated_at ? new Date(lot.updated_at).toLocaleDateString() : "Pending";
-        
-        // Trích xuất Cert Hash
-        let certHash = "-";
-        if (lot.farms && lot.farms.certifications && lot.farms.certifications.length > 0) {
-            certHash = lot.farms.certifications[0].cert_hash;
-        }
-        document.querySelector(".detail-value.cert-hash").textContent = certHash;
-
-    } catch (err) { alert("❌ Lỗi: " + err.message); }
-}
-
-// 3. Xác nhận Chế biến (Confirm)
-document.querySelector(".btn-confirm").addEventListener("click", async () => {
-    const batchId = document.querySelector(".detail-value.batch-id").textContent;
-    if (batchId === "XXXXXXXX") return alert("Hãy chọn lô hàng!");
-
-    const weight = prompt("Nhập khối lượng sau chế biến (kg):");
-    if (!weight) return;
-
-    const res = await fetch(`${API_URL}/lot/${batchId}/process`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ processedWeight: weight })
+    result.data.forEach(lot => {
+      const row = `
+        <tr>
+          <td>${lot.chain_batch_id}</td>
+          <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
+          <td>${lot.processed_weight || lot.initial_weight} kg</td>
+          <td style="font-weight:bold;color:green">${lot.status}</td>
+          <td>
+            <button style="font-weight:bold;background:black;color:white;padding:10px" onclick="viewDetail('${lot.chain_batch_id}')">View</button>
+          </td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML("beforeend", row);
     });
-    const data = await res.json();
-    if(data.success) { alert("✅ Đã xác nhận chế biến!"); location.reload(); }
-});
 
-// 4. Vận chuyển hàng (Ship)
-document.querySelector(".btn-open-cert").insertAdjacentHTML("afterend", '<button class="btn-ship" style="background:#2980b9; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; margin-left:10px;">Ship Batch</button>');
+  } catch (err) {
+    console.error(err);
+  }
+}
 
-document.querySelector(".btn-ship").addEventListener("click", async () => {
-    const batchId = document.querySelector(".detail-value.batch-id").textContent;
-    if (batchId === "XXXXXXXX") return alert("Hãy chọn lô hàng!");
+/* =========================
+   VIEW DETAIL
+========================= */
+async function viewDetail(batchId) {
+  try {
+    const res = await fetch(`${API_URL}/lot/${batchId}`);
+    const result = await res.json();
 
-    if (confirm(`Xác nhận vận chuyển lô hàng ${batchId}?`)) {
-        const res = await fetch(`${API_URL}/lot/${batchId}/ship`, { method: "POST" });
-        const data = await res.json();
-        if(data.success) { alert("✅ Đã đánh dấu Shipped!"); location.reload(); }
+    if (!result.success) throw new Error(result.message);
+
+    const lot = result.data;
+
+    document.querySelector(".detail-value.farm-id").textContent =
+      lot.farms?.chain_farm_id || "N/A";
+
+    document.querySelector(".detail-value.batch-id").textContent =
+      lot.chain_batch_id;
+
+    document.querySelector(".detail-value.quantity").textContent =
+      (lot.processed_weight || lot.initial_weight) + " kg";
+
+    document.querySelector(".detail-value.create-at").textContent =
+      new Date(lot.created_at).toLocaleDateString();
+
+    document.querySelector(".detail-value.done-at").textContent =
+      lot.updated_at
+        ? new Date(lot.updated_at).toLocaleDateString()
+        : "Pending";
+
+    document.querySelector(".detail-value.cert-hash").textContent =
+      lot.tx_hash || "Đã xác thực";
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ " + err.message);
+  }
+}
+
+/* =========================
+   UPDATE STATUS (FINAL FIX)
+========================= */
+document.querySelector(".btn-confirm").addEventListener("click", async () => {
+
+  const batchId = document.querySelector(".detail-value.batch-id").textContent.trim();
+  const status = document.querySelector(".status-select").value;
+  const priceInput = document.querySelector(".price-input").value;
+
+  if (!batchId || batchId === "XXXXXXXX") {
+    return alert("❌ Chưa chọn batch");
+  }
+
+  try {
+    const contract = await ensureWallet();
+    const wallet = await contract.signer.getAddress();
+
+    if (status === "PROCESSED") {
+
+      const weight = prompt("Nhập khối lượng sau chế biến (kg):");
+      if (!weight) return;
+
+      // =========================
+      // 🔥 SET PRICE (QUAN TRỌNG)
+      // =========================
+      if (!priceInput || Number(priceInput) <= 0) {
+        return alert("❌ Nhập price hợp lệ");
+      }
+
+      const priceWei = ethers.utils.parseEther(priceInput);
+
+      const tx1 = await contract.setPrice(batchId, priceWei);
+      await tx1.wait();
+
+      console.log("💰 SET PRICE:", tx1.hash);
+
+      // =========================
+      // 🔥 PROCESS
+      // =========================
+      const tx2 = await contract.processLot(batchId, Number(weight));
+      await tx2.wait();
+
+      console.log("🔥 PROCESS:", tx2.hash);
+
+      // =========================
+      // 🔥 UPDATE DB
+      // =========================
+      const res = await fetch(`${API_URL}/lot/${batchId}/process`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          processedWeight: Number(weight),
+          price: Number(priceInput),
+          wallet: wallet
+        })
+      });
+
+      const result = await res.json();
+      if (!result.success) throw new Error(result.message);
     }
+
+    alert("✅ Thành công");
+    loadMyBatches();
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.message.includes("ONLY_PROCESSOR")) {
+      alert("❌ Ví không phải processor");
+    } else if (err.message.includes("NOT_OWNER")) {
+      alert("❌ Không sở hữu batch");
+    } else if (err.message.includes("BAD_STATUS")) {
+      alert("❌ Sai trạng thái (phải là Created)");
+    } else {
+      alert("❌ " + err.message);
+    }
+  }
 });
 
+/* =========================
+   INIT
+========================= */
 document.addEventListener("DOMContentLoaded", loadMyBatches);
 </script>
-
 </body>
 </html>

@@ -6,6 +6,10 @@
   <title>Processor Dashboard - Traceable Organic Pepper</title>
   <link rel="stylesheet" href="../css/distribution.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/abi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../js/connect.js"></script>
+  <script src="../js/role.js"></script>
   <style>
     .btn-buy {
       background: #859E6A;
@@ -71,6 +75,7 @@
           <th>Farm ID</th>
           <th>Quantity</th>
           <th>Harvest Date</th>
+          <th>Price (ETH)</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -142,13 +147,13 @@
   <div class="detail-value current-owner">XXXXXXX</div>
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
-  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-label cert-hash">Cert:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
   <div class="detail-label status">Status:</div>
   <div class="detail-value status">XXXXXXXXXXXXXX</div>
-  <div class="detail-label view-cert">View certificate</div>
+  <div class="detail-label view-cert">New Price</div>
 
-  <button class="btn-open-cert">Open Cert</button>
+  <button class="btn-open-cert">Set Price</button>
 
   <!-- Footer -->
   <footer class="footer">
@@ -156,119 +161,254 @@
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
-<script>const API_URL = "http://localhost:3001/api";
+</div>
+<script>
+const API_URL = "http://localhost:3001/api";
 
-// 1. Load danh sách hàng có sẵn để mua
+let currentBatchId = null; // 🔥 lưu batch đang xem detail
+
+// =======================
+// LOAD AVAILABLE
+// =======================
 async function loadAvailableBatches() {
     const tbody = document.querySelector("#availableTable tbody");
-    tbody.innerHTML = "<tr><td colspan='5'>Đang tải...</td></tr>";
-    
+    tbody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+
     try {
-        const res = await fetch(`${API_URL}/available-batches`);
+        const res = await fetch(`${API_URL}/distributor/available`);
         const result = await res.json();
-        if (!result.success) return;
 
         tbody.innerHTML = "";
+
+        if (!result.success || result.data.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='6'>No available batches</td></tr>";
+            return;
+        }
+
         result.data.forEach(lot => {
+            const price = 0.002
             const row = `
                 <tr data-batch-id="${lot.chain_batch_id}">
                     <td>${lot.chain_batch_id}</td>
                     <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
                     <td>${lot.initial_weight} kg</td>
                     <td>${new Date(lot.harvest_date).toLocaleDateString()}</td>
-                    <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
+                    <td>${price}</td>
+                    <td>
+                        <button style="font-weight:bold;background:green;color:white;padding:10px" onclick="buyBatch(this)">Buy</button>
+                    </td>
                 </tr>`;
             tbody.insertAdjacentHTML("beforeend", row);
         });
-    } catch (e) { console.error(e); }
-}
 
-// 2. Hàm Mua hàng
-async function buyBatch(btn) {
-    const row = btn.closest("tr");
-    const batchId = row.getAttribute("data-batch-id");
-    const wallet = localStorage.getItem("connectedWallet"); // Lấy ví đã connect ở main.html
-
-    if (!wallet) return alert("Vui lòng kết nối ví trước!");
-
-    if (confirm(`Xác nhận mua Batch ${batchId}?`)) {
-        try {
-            const res = await fetch(`${API_URL}/lot/${batchId}/buy`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ newOwnerWallet: wallet })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert("✅ Đã mua thành công!");
-                location.reload(); // Load lại trang để cập nhật 2 bảng
-            }
-        } catch (err) { alert(err.message); }
+    } catch (e) {
+        console.error(e);
     }
 }
 
-// 3. Hàm Chế biến (Cập nhật khối lượng)
-async function processBatch(batchId) {
-    const weight = prompt("Nhập khối lượng sau chế biến (kg):");
-    if (!weight) return;
+// =======================
+// BUY 
+// =======================
+async function buyBatch(btn) {
+    const row = btn.closest("tr");
+    const batchId = row.getAttribute("data-batch-id");
+    const wallet = localStorage.getItem("connectedWallet");
 
     try {
-        const res = await fetch(`${API_URL}/lot/${batchId}/process`, {
+        const contract = window.getContract();
+
+        const lot = await contract.getLot(batchId);
+        const price = lot.price;
+
+        if (price == 0) return alert("❌ Chưa có giá");
+
+        const tx = await contract.buyLot(batchId, {
+            value: price
+        });
+
+        await tx.wait();
+
+        console.log("🔥 BUY TX:", tx.hash);
+
+        // CALL API
+        const res = await fetch(`${API_URL}/distributor/buy/${batchId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ processedWeight: weight })
+            body: JSON.stringify({ wallet, txHash: tx.hash })
         });
+
         const data = await res.json();
-        if (data.success) {
-            alert("✅ Đã cập nhật trạng thái chế biến!");
-            location.reload();
-        }
-    } catch (err) { alert(err.message); }
+
+        if (!data.success) throw new Error(data.message);
+
+        alert("✅ Bought!");
+        location.reload();
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
 }
 
-// 4. Load My Batches (Hàng mình đã mua)
+// =======================
+// 🔥 SET PRICE (OWNER ONLY)
+// =======================
+async function setPriceForBatch() {
+    if (!currentBatchId) return alert("❌ No batch selected");
+
+    try {
+        const contract = window.getContract();
+
+        let input = prompt("💰 Enter price (ETH):", "0.002");
+
+        if (!input) return;
+
+        const priceWei = ethers.utils.parseEther(input);
+
+        const tx = await contract.setPrice(currentBatchId, priceWei);
+        await tx.wait();
+
+        console.log("🔥 SET PRICE TX:", tx.hash);
+
+        alert("✅ Price set!");
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
+
+// =======================
+// SHIP
+// =======================
+async function shipBatch(batchId) {
+    try {
+        const contract = window.getContract();
+        const tx = await contract.markShipped(batchId);
+        await tx.wait();
+
+        const res = await fetch(`${API_URL}/distributor/ship/${batchId}`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.message);
+
+        alert("🚚 Shipped!");
+        location.reload();
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
+
+// =======================
+// LOAD MY BATCHES
+// =======================
 async function loadMyBatches() {
     const tbody = document.getElementById("myBatchesBody");
-    // Ở đây em có thể viết thêm 1 API lấy batches theo owner_id (ví hiện tại)
-    // Tạm thời em có thể dùng API chung rồi filter ở đây
-    const res = await fetch(`${API_URL}/my-batches`); // Tận dụng API cũ
-    const result = await res.json();
-    if(result.success) {
+    const wallet = localStorage.getItem("connectedWallet");
+
+    if (!wallet) return;
+
+    try {
+        const res = await fetch(`${API_URL}/distributor/my-batches/${wallet}`);
+        const result = await res.json();
+
         tbody.innerHTML = "";
-        result.data.filter(l => l.status !== 'Created').forEach(lot => {
+
+        result.data.forEach(lot => {
             const tr = `
                 <tr>
                     <td>${lot.chain_batch_id}</td>
                     <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.initial_weight} kg</td>
-                    <td><span style="color:blue">${lot.status}</span></td>
+                    <td>${lot.initial_weight}</td>
+                    <td>${lot.status}</td>
                     <td>
-                        <button class="btn-view" onclick="viewDetail('${lot.chain_batch_id}')">View</button>
-                        ${lot.status === 'Processing' ? `<button class="btn-buy" style="background:#f39c12" onclick="processBatch('${lot.chain_batch_id}')">Process</button>` : ''}
+                        ${
+                            lot.status === "Processing"
+                            ? `
+                                <button onclick="shipBatch('${lot.chain_batch_id}')">Ship</button>
+                                <button style="font-weight:bold;background:black;color:white;padding:10px" onclick='viewDetail(${JSON.stringify(lot)})'>View</button>
+                              `
+                            : `<button style="font-weight:bold;background:black;color:white;padding:10px" onclick='viewDetail(${JSON.stringify(lot)})'>View</button>`
+                        }
                     </td>
                 </tr>`;
             tbody.insertAdjacentHTML("beforeend", tr);
         });
+
+    } catch (err) {
+        console.error(err);
     }
 }
 
+// =======================
+// VIEW DETAIL
+// =======================
+function viewDetail(lot) {
+    currentBatchId = lot.chain_batch_id; // 🔥 lưu lại
+
+    document.querySelector(".detail-value.farm-id").innerText =
+        lot.farms?.chain_farm_id || "N/A";
+
+    document.querySelector(".detail-value.batch-id").innerText =
+        lot.chain_batch_id;
+
+    document.querySelector(".detail-value.quantity").innerText =
+        lot.initial_weight;
+
+    document.querySelector(".detail-value.create-at").innerText =
+        new Date(lot.created_at).toLocaleDateString();
+
+    document.querySelector(".detail-value.done-at").innerText =
+        lot.updated_at
+            ? new Date(lot.updated_at).toLocaleDateString()
+            : "N/A";
+
+    document.querySelector(".detail-value.current-owner").innerText =
+        lot.owner_id;
+
+    document.querySelector(".detail-value.status").innerText =
+        lot.status;
+
+    document.querySelector(".detail-value.cert-hash").innerText =
+        lot.cert_hash || "Đã xác thực";
+
+    document.querySelector(".detail-value.retailer").innerText =
+        lot.retailer_id || "N/A";
+
+    document.querySelector(".detail-title").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+// =======================
+// BIND BUTTON OPEN CERT → SET PRICE
+// =======================
+document.querySelector(".btn-open-cert").addEventListener("click", setPriceForBatch);
+
+// =======================
 document.addEventListener("DOMContentLoaded", () => {
     loadAvailableBatches();
     loadMyBatches();
-});</script>
-
-
+});
+</script>
 </body>
 </html>

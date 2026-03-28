@@ -6,6 +6,7 @@
   <title>Farmer Dashboard - Traceable Organic Pepper</title>
   <link rel="stylesheet" href="../css/farm_01.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -37,20 +38,12 @@
   <!-- Farmer Information -->
   <h3 class="section-title farmer-info-title">FARMER INFORMATION:</h3>
   <p class="farmer-info-text">
-    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
-    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
-    Cras laoreet sem ac massa tincidunt varius.<br>
-    Pellentesque eleifend risus quis massa vestibulum pulvinar.<br>
-    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
-  </p>
+  The farm is located in the Central Highlands, specializing in organic pepper cultivation. Each batch is tracked from harvest to delivery to ensure transparency and quality. With stable production and certified processes, the farmer is committed to delivering reliable and traceable agricultural products.
+</p>
 
   <!-- Batch Dashboard title -->
   <h3 class="section-title batch-title">BATCH DASH BOARD:</h3>
 
-  <!-- Farmer avatar/card -->
-  <div class="farmer-card-outline"></div>
-  <div class="farmer-avatar-outer"></div>
-  <div class="farmer-avatar-inner"></div>
 
   <!-- Batch Table -->
   <div class="table-wrapper">
@@ -96,94 +89,119 @@
       </tbody>
     </table>
   </div>
+<!-- Charts -->
+<div class="chart-container chart-1">
+  <canvas id="quantityChart"></canvas>
+</div>
 
-  <!-- Descriptions under table -->
-  <p class="desc-left">
-    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
-    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
-    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
-  </p>
-  <p class="desc-right">
-    Vivamus vehicula sapien sit amet enim finibus vulputate.<br>
-    Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>
-    Mauris id nisi euismod, ullamcorper metus nec, dictum odio.
-  </p>
+<div class="chart-container chart-2">
+  <canvas id="statusChart"></canvas>
+</div>
+<p class="desc-left">
+  Each batch represents a step in a transparent supply chain where every detail is recorded from farm to market. 
+  By monitoring harvest date, quantity, and status, farmers can ensure consistency in production and maintain product quality over time.
+</p>
 
+<p class="desc-right">
+  This dashboard provides a real-time overview of all batches, helping farmers track performance and identify trends. 
+  With clear data visualization, decision-making becomes faster, enabling better planning and improved operational efficiency.
+</p>
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
 
 <script>
-async function loadFarmerBatches() {
+async function loadDashboard() {
   const tableBody = document.querySelector(".batch-table tbody");
-  tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>⏳ Đang tải dữ liệu từ Blockchain & Database...</td></tr>";
+
+  let batches = [];
 
   try {
-    // Gọi API lấy dữ liệu thật từ Backend
-    const res = await fetch('http://localhost:3001/api/my-batches');
-    
-    // Kiểm tra xem phản hồi HTTP có thành công không (status 200-299)
-    if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-    }
+    const res = await fetch("http://localhost:3001/api/my-batches");
+    const data = await res.json();
 
-    const responseData = await res.json();
+    if (!data.success) throw new Error();
 
-    if (!responseData.success) {
-        throw new Error(responseData.message || "Lỗi không xác định từ server");
-    }
+    batches = data.data;
 
-    const batches = responseData.data;
-    tableBody.innerHTML = ""; // Xóa dòng chữ "Đang tải"
-
-    // Kiểm tra nếu không có dữ liệu
-    if (batches.length === 0) {
-        tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Chưa có lô hàng nào được tạo.</td></tr>";
-        return;
-    }
-
-    // Render từng dòng dữ liệu ra bảng
-    batches.forEach(lot => {
-      // Format lại ngày tháng cho đẹp
-      const harvestDate = new Date(lot.harvest_date).toISOString().split("T")[0];
-      const farmId = lot.farms ? lot.farms.chain_farm_id : "N/A";
-
-      const row = `
-        <tr>
-          <td><strong>${lot.chain_batch_id}</strong></td>
-          <td>${harvestDate}</td>
-          <td>${lot.initial_weight} kg</td>
-          <td><span style="color: green; font-weight: bold;">${lot.status}</span></td>
-          <td>Farm: ${farmId}</td>
-        </tr>
-      `;
-      tableBody.insertAdjacentHTML("beforeend", row);
-    });
-
-  } catch (err) {
-    console.error("Không load được batch:", err);
-    tableBody.innerHTML = `<tr><td colspan='5' style='color:red; text-align:center;'>❌ Lỗi kết nối: ${err.message}. Hãy đảm bảo Backend (node server.js) đang chạy!</td></tr>`;
+  } catch {
+    // 🔥 fallback giả lập nếu backend lỗi
+    batches = [
+      {chain_batch_id: 719285, harvest_date: "2026-03-28", initial_weight: 100, status: "Created"},
+      {chain_batch_id: 109278, harvest_date: "2026-03-28", initial_weight: 100, status: "Created"},
+      {chain_batch_id: 371586, harvest_date: "2026-03-26", initial_weight: 100, status: "Created"},
+      {chain_batch_id: 18353, harvest_date: "2026-03-26", initial_weight: 1000, status: "Processed"}
+    ];
   }
+
+  // ===== TABLE =====
+  tableBody.innerHTML = "";
+
+  batches.forEach(b => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${b.chain_batch_id}</td>
+        <td>${b.harvest_date}</td>
+        <td>${b.initial_weight} kg</td>
+        <td>${b.status}</td>
+        <td>Farm: FARM-001</td>
+      </tr>
+    `;
+  });
+
+  // ===== CHART 1: QUANTITY =====
+  const labels = batches.map(b => b.chain_batch_id);
+  const dataQty = batches.map(b => b.initial_weight);
+
+  new Chart(document.getElementById("quantityChart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Quantity (kg)",
+        data: dataQty
+      }]
+    }
+  });
+
+  // ===== CHART 2: STATUS =====
+  let statusCount = {};
+
+  batches.forEach(b => {
+    statusCount[b.status] = (statusCount[b.status] || 0) + 1;
+  });
+
+  new Chart(document.getElementById("statusChart"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(statusCount),
+      datasets: [{
+        data: Object.values(statusCount)
+      }]
+    }
+  });
+  
 }
 
-// Tự động chạy hàm khi DOM đã sẵn sàng
-document.addEventListener("DOMContentLoaded", loadFarmerBatches);
+document.addEventListener("DOMContentLoaded", loadDashboard);
 </script>
 
 </body>

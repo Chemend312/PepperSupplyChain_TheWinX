@@ -75,7 +75,105 @@ body {
   background: linear-gradient(rgba(30,60,40,0.6), rgba(30,60,40,0.6)),
               url('../../assets/hero 1.png') center / cover;
 }
+/* TITLE */
+.title-main {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 1px;
+}
 
+.title-trace {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.instruction {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* INPUT LABEL */
+.batch-label {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* INPUT */
+.batch-input {
+  font-size: 16px;
+  padding: 4px 10px;
+}
+
+/* BUTTON */
+.btn-scan-text {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* INFO TEXT (QUAN TRỌNG NHẤT) */
+.info-text {
+  max-height: 400px;      /* chiều cao box */
+  overflow-y: auto;       /* scroll dọc */
+  padding-right: 10px;    /* tránh dính scrollbar */
+}
+
+/* scroll đẹp hơn (optional nhưng nên có) */
+.info-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.info-text::-webkit-scrollbar-thumb {
+  background: #859E6A;
+  border-radius: 10px;
+}
+
+.info-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* TIMELINE TEXT */
+.info-text div {
+  margin-bottom: 10px;
+}
+
+/* TIME */
+.info-text div b {
+  font-size: 16px;
+  color: #dcdcdc;
+}
+
+/* ACTION */
+.info-text div:nth-child(2) {
+  font-weight: 600;
+}
+
+/* STATUS */
+.info-text div:nth-child(3) {
+  color: #f1c40f;
+}
+
+/* OWNER */
+.info-text div:nth-child(4) {
+  font-size: 16px;
+  color: #ccc;
+}
+
+/* TX HASH */
+.info-text div:nth-child(5) {
+  font-size: 16px;
+  color: #ccc;
+}
 .title-main {
   position: absolute;
   width: 1343px;
@@ -90,7 +188,7 @@ body {
 .title-trace {
   position: absolute;
   width: 1026px;
-  left: 207px;
+  left: 200px;
   top: 292px;
   text-align: center;
   font-size: 36px;
@@ -177,8 +275,8 @@ body {
   outline-offset: -0.5px;
 }
 
-.section-title.left  { left: 98px;  top: 715px; width: 1026px; }
-.section-title.right { left: 836px; top: 715px; width: 1026px; }
+.section-title.left  { left: 10px;  top: 715px; width: 1026px; }
+.section-title.right { left: 600px; top: 715px; width: 1026px; }
 
 .section-title {
   position: absolute;
@@ -192,7 +290,7 @@ body {
   left: 827px;
   top: 785px;
   width: 515px;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
   line-height: 1.45;
 }

@@ -37,7 +37,15 @@
   <h3 class="section-title left">TRACE YOUR PRODUCT:</h3>
   <h3 class="section-title right">INFORMATION:</h3>
 
-  <div class="info-text">Vivamus vehicula sapien sit amet enim finibus vulputate.<br>Duis id mauris imperdiet, efficitur augue vel, tempus mauris.<br>Cras laoreet sem ac massa tincidunt varius.<br>Pellentesque eleifend risus quis massa vestibulum pulvinar.<br>Mauris id nisi euismod, ullamcorper metus nec, dictum odio.</div>
+  <div class="info-text">
+  Welcome to the Traceability System of The WinX.<br><br>
+
+  To begin, enter a valid Batch ID or scan the QR code. The system will 
+  retrieve detailed information such as status changes, ownership history, 
+  and transaction records from the blockchain network.<br><br>
+
+  Experience a new standard of trust and traceability in agricultural supply chains.
+</div>
 
   <img class="scan-icon" src="../../assets/Scan Stock.png" alt="Scan">
   <img class="qr-example" src="../../assets/image 2.png" alt="QR">
@@ -48,74 +56,98 @@
   <div class="footer-bg"></div>
   <div class="footer-logo-bg"></div>
 
-  <div class="footer-text left">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-    Proin pharetra augue vel ornare interdum.
-  </div>
+  <div class="footer-text left"> 
+  <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
 
-  <div class="footer-text right">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-    Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-    Proin pharetra augue vel ornare interdum.
-  </div>
+  This project focuses on building a transparent supply chain system 
+  using blockchain technology, enabling traceability, data integrity, 
+  and trust among stakeholders.
+</div>
 
+<div class="footer-text right">
+  <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam<br><br>
+
+  © 2026 The WinX. All rights reserved.<br>
+  Designed & Developed for academic purposes.
+</div>
 </div>
 
 <script>
 async function traceProduct() {
-  const batchInput = document.querySelector(".batch-input");
+  const batchId = document.querySelector(".batch-input").value.trim();
   const infoBox = document.querySelector(".info-text");
-  const batchId = batchInput.value.trim();
 
   if (!batchId) {
-    alert("⚠️ Vui lòng nhập Batch ID (Ví dụ: 123456)!");
+    alert("Nhập Batch ID!");
     return;
   }
 
-  // Hiệu ứng đang tải
-  infoBox.innerHTML = "⏳ Đang truy xuất dữ liệu từ Blockchain...";
-  infoBox.style.color = "#333";
+  infoBox.innerHTML = "⏳ Loading...";
 
   try {
-    // Gọi API đã đổi sang cổng 3001
     const res = await fetch(`http://localhost:3001/api/trace/${batchId}`);
     const result = await res.json();
 
     if (!result.success) {
-      infoBox.innerHTML = `<span style="color:red;">❌ ${result.message}</span>`;
+      infoBox.innerHTML = `<span style="color:red;">${result.message}</span>`;
       return;
     }
 
-    const lot = result.data;
-    const farm = lot.farms || {};
-    const cert = (farm.certifications && farm.certifications[0]) ? farm.certifications[0] : null;
+    const { batch, history } = result.data;
 
-    // Đổ dữ liệu vào giao diện theo format đẹp
+    let timeline = "";
+
+    history.forEach(h => {
+      timeline += `
+        <div style="
+          border-left: 3px solid #2ecc71;
+          padding-left: 10px;
+          margin-bottom: 12px;
+        ">
+          <div><b>${new Date(h.timestamp).toLocaleString('vi-VN')}</b></div>
+
+          <div>Action: ${h.action_type}</div>
+
+          <div>
+            Status: 
+            ${h.old_status || "Start"} → ${h.new_status || "Unknown"}
+          </div>
+
+          <div>Owner: ${h.updated_by}</div>
+
+          <div style="font-size:12px;word-break:break-all;">
+            TX: ${h.tx_hash}
+          </div>
+        </div>
+      `;
+    });
+
     infoBox.innerHTML = `
-      <div style="line-height: 1.8;">
-        <p><strong>📦 BATCH ID:</strong> <span style="color:#2ecc71;">${lot.chain_batch_id}</span></p>
-        <p><strong>🏡 Farm:</strong> ${farm.farm_name || "N/A"}</p>
-        <p><strong>📍 Location:</strong> ${farm.location || "N/A"}</p>
-        <p><strong>⚖️ Initial Weight:</strong> ${lot.initial_weight} kg</p>
-        <p><strong>📅 Harvest Date:</strong> ${new Date(lot.harvest_date).toLocaleDateString('vi-VN')}</p>
-        <p><strong>📜 Certificate:</strong> ${cert ? cert.cert_type : "None"}</p>
-        <p><strong>🔗 Cert Hash:</strong> <small style="word-break: break-all;">${cert ? cert.cert_hash : "N/A"}</small></p>
-        <p><strong>🚀 Current Status:</strong> <span style="text-transform: uppercase; font-weight: bold; color: #f39c12;">${lot.status}</span></p>
+      <div>
+        <h3>Batch: ${batch.chain_batch_id}</h3>
+        <p>Weight: ${batch.initial_weight}</p>
+        <p>Status: ${batch.status}</p>
+
         <hr>
-        <p><small><i>Lô hàng này đã được xác thực bởi Smart Contract trên mạng Blockchain nội bộ.</i></small></p>
+
+        <h4>History</h4>
+        ${timeline || "<p>No history</p>"}
       </div>
     `;
 
   } catch (err) {
-    infoBox.innerHTML = `<span style="color:red;">❌ Lỗi kết nối: ${err.message}</span>`;
+    infoBox.innerHTML = `<span style="color:red;">${err.message}</span>`;
   }
 }
 
-// Gắn sự kiện cho nút Scan
 document.querySelector(".btn-scan-text").addEventListener("click", traceProduct);
 
-// Cho phép nhấn phím Enter để tìm kiếm cho tiện
 document.querySelector(".batch-input").addEventListener("keypress", (e) => {
   if (e.key === "Enter") traceProduct();
 });

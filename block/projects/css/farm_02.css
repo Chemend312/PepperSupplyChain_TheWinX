@@ -143,7 +143,8 @@ body {
 .form-label.farm-id-label     { left: 108px; top: 814px; }
 .form-label.harvest-date-label { left: 108px; top: 888px; }
 .form-label.quantity-label    { left: 108px; top: 962px; }
-.form-label.note-label        { left: 108px; top: 1036px; }
+.form-label.price-label    { left: 108px; top: 1036px; }
+.form-label.note-label        { left: 108px; top: 1106px; }
 
 .form-input {
   position: absolute;
@@ -159,7 +160,8 @@ body {
 .form-input.farm-id-input     { width: 440px; height: 29px; top: 814px; }
 .form-input.harvest-date-input { width: 440px; height: 29px; top: 888px; }
 .form-input.quantity-input    { width: 440px; height: 29px; top: 962px; }
-.form-input.note-input        { width: 440px; height: 90px; top: 1036px; resize: none; }
+.form-input.price-input    { width: 440px; height: 29px; top: 1036px; }
+.form-input.note-input        { width: 440px; height: 90px; top: 1106px; resize: none; }
 
 /* Right side (display values) */
 .form-label.right {
@@ -184,28 +186,28 @@ body {
   width: 184px;
   height: 60px;
   left: 108px;
-  top: 1171px;
+  top: 1200px;
   position: absolute;
   background: #859E6A;
   border-radius: 10px;
 }
 
 .btn-create-text {
-  left: 149px;
-  top: 1181px;
+  left: 125px;
+  top: 1215px;
   position: absolute;
   color: rgba(244, 239, 233, 0.80);
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 500;
   text-align: center;
-  width: 100px;
+  width: 150px;
 }
 
 .btn-qr-bg {
   width: 253.85px;
   height: 60px;
   left: 1021.07px;
-  top: 1171px;
+  top: 1200px;
   position: absolute;
   background: #859E6A;
   border-radius: 10px;
@@ -213,10 +215,10 @@ body {
 
 .btn-qr-text {
   left: 999px;
-  top: 1181px;
+  top: 1215px;
   position: absolute;
   color: rgba(244, 239, 233, 0.80);
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 500;
   text-align: center;
   width: 298px;

@@ -47,6 +47,9 @@
   <div class="form-label quantity-label">Quantity (kg):</div>
   <input type="text" class="form-input quantity-input">
 
+  <div class="form-label price-label">Price (ETH):</div>
+  <input type="text" class="form-input price-input">
+
   <div class="form-label note-label">Note:</div>
   <textarea class="form-input note-input"></textarea>
 
@@ -60,8 +63,6 @@
   <div class="form-label quantity-label right">Quantity (kg):</div>
   <div class="form-value quantity-value">XXXX</div>
 
-  <div class="form-label note-label right">Note:</div>
-  <div class="form-value note-value">XXXXXXXX</div>
 
   <!-- Buttons -->
   <div class="btn-create-bg"></div>
@@ -81,100 +82,206 @@
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
 
+<script src="../js/abi.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="../js/connect.js"></script>
+
+<!-- QR lib -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 <script>
-const FARMER_PRIVATE_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
+const API_URL = "http://localhost:3001/api";
 
-document.querySelector(".btn-create-text").addEventListener("click", async function() {
-  const farmId = document.querySelector(".farm-id-input").value;
-  const harvestDate = document.querySelector(".harvest-date-input").value;
-  const quantity = document.querySelector(".quantity-input").value;
-  const note = document.querySelector(".note-input").value;
+const btn = document.querySelector(".btn-create-text");
 
-  if (!farmId || !harvestDate || !quantity) {
-    alert("Vui lòng nhập đầy đủ Farm ID, Harvest Date và Quantity!");
+// ===== INPUT =====
+const farmInput = document.querySelector(".farm-id-input");
+const dateInput = document.querySelector(".harvest-date-input");
+const quantityInput = document.querySelector(".quantity-input");
+const noteInput = document.querySelector(".note-input");
+const priceInput = document.querySelector(".price-input");
+
+// ===== PREVIEW =====
+const farmValue = document.querySelector(".farm-id-value");
+const dateValue = document.querySelector(".harvest-date-value");
+const quantityValue = document.querySelector(".quantity-value");
+const priceValue = document.querySelector(".price-value");
+
+const qrImg = document.querySelector(".qr-image");
+
+let currentLotId = null;
+
+// =====================================
+// CONNECT WALLET (AUTO)
+// =====================================
+async function ensureWallet() {
+  let contract = window.getContract();
+
+  if (!contract) {
+    try {
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      contract = window.getContract();
+    } catch (err) {
+      alert("❌ Không connect được ví");
+      return null;
+    }
+  }
+
+  return contract;
+}
+
+// =====================================
+// REALTIME PREVIEW
+// =====================================
+function updatePreview() {
+  farmValue.innerText = farmInput.value || "XXXXXXXX";
+  quantityValue.innerText = quantityInput.value || "XXXX";
+  priceValue.innerText = priceInput.value || "XXXX";
+  dateValue.innerText = dateInput.value || new Date().toLocaleDateString();
+}
+
+[farmInput, quantityInput, noteInput, dateInput, priceInput]
+  .forEach(i => i.addEventListener("input", updatePreview));
+
+// =====================================
+// CREATE + SET PRICE
+// =====================================
+btn.addEventListener("click", async () => {
+
+  const contract = await ensureWallet();
+  if (!contract) return;
+
+  const farmId = farmInput.value.trim();
+  const quantity = quantityInput.value.trim();
+  const note = noteInput.value.trim();
+  const price = priceInput.value.trim();
+
+  if (!farmId || !quantity || !price) {
+    alert("❌ Nhập thiếu dữ liệu");
     return;
   }
 
-  const numericBatchId = Math.floor(Math.random() * 1000000);
-  
-  const btnText = this;
-  const originalText = btnText.textContent;
-  btnText.textContent = "Đang xử lý...";
-  btnText.style.pointerEvents = "none";
+  const lotId = Math.floor(Math.random() * 1000000);
+
+  btn.innerText = "Đang xử lý...";
+  btn.style.pointerEvents = "none";
 
   try {
-    const res = await fetch("http://localhost:3001/api/create-lot", {
+    const farmIdBytes = ethers.utils.formatBytes32String(farmId);
+
+    // ===== 1. CREATE LOT =====
+    const tx = await contract.createLot(
+      lotId,
+      farmIdBytes,
+      Number(quantity)
+    );
+
+    await tx.wait();
+
+    // ===== 2. SET PRICE =====
+    const priceWei = ethers.utils.parseEther(price);
+
+    const tx2 = await contract.setPrice(
+      lotId,
+      priceWei
+    );
+
+    await tx2.wait();
+
+    const owner = await contract.signer.getAddress();
+
+    // ===== 3. SAVE DB =====
+    const res = await fetch(`${API_URL}/save-batch`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        id: numericBatchId,
-        chainFarmId: farmId,
-        weight: parseInt(quantity),
-        harvestDate: harvestDate,
-        farmerPrivateKey: FARMER_PRIVATE_KEY
+        chain_batch_id: lotId,
+        farm_id: farmId,
+        initial_weight: Number(quantity),
+        owner: owner
       })
     });
 
-    const data = await res.json();
-    
-    if (data.success) {
-      alert(`Tạo lô hàng thành công!\nMã lô: ${numericBatchId}\nTxHash: ${data.data.txHash}`);
+    const result = await res.json();
+    if (!result.success) throw new Error(result.message);
 
-      document.querySelector(".farm-id-value").textContent = farmId;
-      document.querySelector(".harvest-date-value").textContent = harvestDate;
-      document.querySelector(".quantity-value").textContent = quantity;
-      document.querySelector(".note-value").textContent = note || "Không có ghi chú";
+    // ===== 4. UI UPDATE =====
+    farmValue.innerText = farmId;
+    quantityValue.innerText = quantity;
+    dateValue.innerText = new Date().toLocaleDateString();
 
-      generateQRCode(numericBatchId);
-    } else {
-      alert("Lỗi: " + data.message);
-    }
+    // ===== 5. QR =====
+    const qrData = JSON.stringify({
+      lotId,
+      farmId,
+      quantity,
+      price,
+      owner
+    });
+
+    QRCode.toDataURL(qrData, function (err, url) {
+      if (!err) qrImg.src = url;
+    });
+
+    currentLotId = lotId;
+
+    alert(`✅ Thành công!\nLot: ${lotId}\nPrice: ${price} ETH`);
+
   } catch (err) {
-    alert("Lỗi kết nối Backend: " + err.message);
-  } finally {
-    btnText.textContent = originalText;
-    btnText.style.pointerEvents = "auto";
+    console.error(err);
+
+    if (err.message.includes("ONLY_FARMER")) {
+      alert("❌ Ví không phải FARMER");
+    } else if (err.message.includes("FARM_NOT_CERTIFIED")) {
+      alert("❌ Farm chưa được certify");
+    } else if (err.message.includes("NOT_OWNER")) {
+      alert("❌ Không phải owner để set giá");
+    } else {
+      alert("❌ Lỗi: " + (err.reason || err.message));
+    }
   }
+
+  btn.innerText = "Create";
+  btn.style.pointerEvents = "auto";
 });
 
-function generateQRCode(batchId) {
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BATCH_ID:${batchId}`;
-  document.querySelector(".qr-image").src = qrImageUrl;
+// =====================================
+// DOWNLOAD QR
+// =====================================
+document.querySelector(".btn-qr-text").addEventListener("click", () => {
 
-  const downloadBtn = document.querySelector(".btn-qr-text");
-  const newDownloadBtn = downloadBtn.cloneNode(true);
-  downloadBtn.parentNode.replaceChild(newDownloadBtn, downloadBtn);
-  
-  newDownloadBtn.addEventListener("click", async () => {
-    try {
-        const response = await fetch(qrImageUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `QR_Batch_${batchId}.png`;
-        link.click();
-        window.URL.revokeObjectURL(url);
-    } catch (e) {
-        window.open(qrImageUrl, '_blank');
-    }
-  });
-}
+  if (!qrImg.src || !currentLotId) {
+    alert("❌ Chưa có QR");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = qrImg.src;
+  link.download = `batch_qr_${currentLotId}.png`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
 </script>
 
 </body>

@@ -168,17 +168,20 @@ body {
 .table-wrapper {
   position: absolute;
   left: 108px;
-  top: 1824px;
+  top: 1900px;
   width: 1222px;
   height: 384px;
   background: #F4EFE9;
+
+  overflow-y: auto; 
+  overflow-x: hidden;
 }
 
 .batch-table {
   width: 100%;
-  height: 100%;
   border-collapse: collapse;
   color: #1B2E17;
+
 }
 
 .batch-table th,
@@ -228,7 +231,7 @@ body {
 
 .desc-right {
   width: 498px;
-  left: 834px;
+  left: 750px;
   top: 1570px;
   position: absolute;
   font-size: 24px;
@@ -272,5 +275,34 @@ body {
   color: #F4EFE9;
 }
 
-.footer-text.left  { left: 410px; top: 2469px; }
-.footer-text.right { left: 940px; top: 2475px; }
+.footer-text.left  { left: 410px; top: 2450px; }
+.footer-text.right { left: 940px; top: 2450px; }
+
+/* ── Dashboard Charts ───────────────────────────── */
+
+.chart-container {
+  position: absolute;
+  width: 500px;
+  height: 450px;
+  background: #F4EFE9;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+/* Chart 1: Quantity */
+.chart-1 {
+  left: 108px;
+  top: 1100px;
+}
+
+/* Chart 2: Status */
+.chart-2 {
+  left: 732px;
+  top: 1100px;
+}
+
+/* Canvas bên trong */
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

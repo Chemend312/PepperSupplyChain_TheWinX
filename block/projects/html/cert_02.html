@@ -6,6 +6,25 @@
   <title>Issue Certificate - Certification Authority</title>
   <link rel="stylesheet" href="../css/cert_02.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/abi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../js/connect.js"></script>
+  <script src="../js/role.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  await autoConnect();
+
+  const role = await getUserRole();
+
+  if (role !== "certifier") {
+    alert("Không phải certifier");
+    location.href = "index.html";
+  }
+
+  console.log("✅ Certifier ready");
+});
+</script>
 </head>
 
 <body>
@@ -19,10 +38,10 @@
     <img class="logo-main" src="../../assets/logo-removebg-preview 1.png" alt="Logo">
 
     <nav class="nav-menu">
-      <a href="cert_01.html" class="nav-item home">Home</a>
+      <a href="main.html" class="nav-item home">Home</a>
       <a href="cert_01.html" class="nav-item dashboard">Dash Board</a>
       <a href="cert_02.html" class="nav-item issue-cert active">Issue Certificate</a>
-      <a href="#" class="nav-item connect-wallet">Connect Wallet</a>
+      <a href="#" class="nav-item connect-wallet">Hello Certificer</a>
     </nav>
   </header>
 
@@ -56,16 +75,18 @@
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
@@ -77,45 +98,51 @@ document.querySelector(".btn-issue-text").addEventListener("click", async () => 
   const fileInput = document.querySelector("#cert-file").files[0];
 
   if (!farmIdInput || !fileInput) {
-    alert("⚠️ Vui lòng nhập Farm ID và chọn file chứng nhận (PDF/Ảnh)!");
+    alert("⚠️ Nhập Farm ID + chọn file!");
+    return;
+  }
+
+  const contract = window.getContract();
+
+  if (!contract) {
+    alert("⚠️ Chưa connect ví");
     return;
   }
 
   try {
-    // 1. Tạo mã Hash SHA-256 từ file (Dấu vân tay số của chứng chỉ)
+    // ===== HASH FILE =====
     const buffer = await fileInput.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const certHash = "0x" + hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    const certHash =
+      "0x" + hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-    // 2. Tính ngày hết hạn (mặc định 1 năm sau kể từ hôm nay)
-    const today = new Date();
-    const nextYear = new Date(today.setFullYear(today.getFullYear() + 1));
-    const expiryDateStr = nextYear.toISOString().split('T')[0];
+    // ===== FARM ID → bytes32 =====
+    const farmIdBytes = ethers.utils.formatBytes32String(farmIdInput);
 
-    // 3. Gửi dữ liệu lên Backend (Cổng 3001)
-    const res = await fetch("http://localhost:3001/api/certify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chainFarmId: farmIdInput,
-        certHash: certHash,
-        certificateType: "Organic Pepper Standard",
-        expiryDate: expiryDateStr
-      })
-    });
+    // ===== EXPIRY =====
+    const oneYear = 365 * 24 * 60 * 60;
+    const validUntil = Math.floor(Date.now() / 1000) + oneYear;
 
-    const data = await res.json();
-    
-    if (data.success) {
-      alert("✅ Cấp chứng nhận thành công!\nTxHash: " + data.txHash);
-      // Chuyển hướng về trang danh sách để xem kết quả
-      window.location.href = "cert_01.html";
-    } else {
-      alert("❌ Lỗi: " + data.error);
-    }
+    // ===== CALL CONTRACT =====
+    const tx = await contract.certifyFarm(
+      farmIdBytes,
+      certHash,
+      validUntil
+    );
+
+    await tx.wait();
+
+    alert("✅ Certify thành công!\nTx: " + tx.hash);
+
   } catch (err) {
-    alert("❌ Không thể kết nối đến Server: " + err.message);
+    console.error(err);
+
+    if (err.message.includes("ONLY_CERTIFIER")) {
+      alert("❌ Ví này KHÔNG phải certifier");
+    } else {
+      alert("❌ Lỗi: " + err.message);
+    }
   }
 });
 </script>

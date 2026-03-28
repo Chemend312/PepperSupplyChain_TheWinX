@@ -6,6 +6,10 @@
   <title>Retail Dashboard - Traceable Organic Pepper</title>
   <link rel="stylesheet" href="../css/retail.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/abi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../js/connect.js"></script>
+  <script src="../js/role.js"></script>
   <style>
     .btn-buy {
       background: #859E6A;
@@ -154,139 +158,234 @@
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
 
-  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-label cert-hash">Cert:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
   <div class="detail-value status">XXXXXXXXXXXXXX</div>
 
-  <div class="detail-label view-cert">View certificate</div>
+  <div class="detail-label view-cert">New Price</div>
 
-  <button class="btn-open-cert">Open Cert</button>
+  <button class="btn-open-cert" onclick="setPrice()">Set Price</button>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
 <script>
 const API_URL = "http://localhost:3001/api";
+let currentBatchId = null;
 
-// 1. Tải hàng sẵn sàng để nhập kho (Status: Shipped)
+// =======================
+// LOAD AVAILABLE
+// =======================
 async function loadAvailable() {
     const tbody = document.querySelector("#availableTable tbody");
-    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>⏳ Đang tìm lô hàng từ nhà máy...</td></tr>";
-    
+    tbody.innerHTML = "Loading...";
+
     try {
-        const res = await fetch(`${API_URL}/shipped-batches`);
+        const res = await fetch(`${API_URL}/retailer/available`);
         const result = await res.json();
+
         tbody.innerHTML = "";
-        
-        if (result.data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>Chưa có lô hàng nào được vận chuyển tới.</td></tr>";
+
+        result.data.forEach(lot => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${lot.chain_batch_id}</td>
+                    <td>${lot.farms?.chain_farm_id || "N/A"}</td>
+                    <td>${lot.processed_weight || lot.initial_weight || 0}</td>
+                    <td>${lot.harvest_date || "N/A"}</td>
+                    <td>
+                        <button style="font-weight:bold;background:green;color:white;padding:10px" class="btn-buy" onclick="receive('${lot.chain_batch_id}')">
+                            Buy
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = "Error loading data";
+    }
+}
+
+// =======================
+// BUY / RECEIVE
+// =======================
+async function receive(batchId) {
+    try {
+        const contract = window.getContract();
+
+        const lot = await contract.getLot(batchId);
+
+        const tx = await contract.buyLot(batchId, {
+            value: lot.price
+        });
+
+        await tx.wait();
+
+        const wallet = localStorage.getItem("connectedWallet");
+
+        const res = await fetch(`${API_URL}/retailer/receive/${batchId}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                txHash: tx.hash,
+                wallet: wallet
+            })
+        });
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        alert("✅ Bought!");
+        loadAvailable();
+        loadInventory();
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
+
+// =======================
+// LOAD INVENTORY
+// =======================
+async function loadInventory() {
+    const wallet = localStorage.getItem("connectedWallet");
+    const tbody = document.getElementById("myInventoryBody");
+
+    if (!wallet) {
+        tbody.innerHTML = "<tr><td colspan='5'>No wallet</td></tr>";
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/retailer/my-batches/${wallet}`);
+        const result = await res.json();
+
+        tbody.innerHTML = "";
+
+        result.data.forEach(lot => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${lot.chain_batch_id}</td>
+                    <td>${lot.farms?.chain_farm_id || "N/A"}</td>
+                    <td>${lot.processed_weight || lot.initial_weight || 0}</td>
+                    <td>${lot.status}</td>
+                    <td>
+                        <button class="btn-view" style="font-weight:bold;background:black;color:white;padding:10px" onclick="viewDetail('${lot.chain_batch_id}')">
+                            View
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = "Error loading inventory";
+    }
+}
+
+// =======================
+// VIEW DETAIL
+// =======================
+async function viewDetail(batchId) {
+    try {
+        currentBatchId = batchId;
+
+        // tìm trong available
+        let res = await fetch(`${API_URL}/retailer/available`);
+        let result = await res.json();
+
+        let lot = result.data.find(x => x.chain_batch_id == batchId);
+
+        // nếu không có → tìm inventory
+        if (!lot) {
+            const wallet = localStorage.getItem("connectedWallet");
+            res = await fetch(`${API_URL}/retailer/my-batches/${wallet}`);
+            result = await res.json();
+
+            lot = result.data.find(x => x.chain_batch_id == batchId);
+        }
+
+        if (!lot) return;
+
+        document.querySelector(".detail-value.batch-id").innerText = lot.chain_batch_id;
+        document.querySelector(".detail-value.farm-id").innerText = lot.farms?.chain_farm_id || "N/A";
+        document.querySelector(".detail-value.quantity").innerText = lot.processed_weight || lot.initial_weight || 0;
+        document.querySelector(".detail-value.create-at").innerText = lot.created_at || "N/A";
+        document.querySelector(".detail-value.done-at").innerText = lot.updated_at || "N/A";
+        document.querySelector(".detail-value.current-owner").innerText = lot.owner_id || "N/A";
+        document.querySelector(".detail-value.retailer").innerText = "You";
+        document.querySelector(".detail-value.cert-hash").innerText = lot.cert_hash || "Đã xác thực";
+        document.querySelector(".detail-value.status").innerText = lot.status;
+
+        // scroll xuống detail
+        document.querySelector(".detail-title").scrollIntoView({
+            behavior: "smooth"
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// =======================
+// SET PRICE (OPEN CERT BUTTON)
+// =======================
+async function setPrice() {
+    try {
+        if (!currentBatchId) {
+            alert("❌ Chọn batch trước!");
             return;
         }
 
-        result.data.forEach(lot => {
-            const row = `
-                <tr data-batch-id="${lot.chain_batch_id}">
-                    <td><strong>${lot.chain_batch_id}</strong></td>
-                    <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.processed_weight || lot.initial_weight} kg</td>
-                    <td>${new Date(lot.harvest_date).toLocaleDateString()}</td>
-                    <td><button class="btn-buy" onclick="buyBatch(this)">Receive</button></td>
-                </tr>`;
-            tbody.insertAdjacentHTML("beforeend", row);
-        });
-    } catch (e) { console.error(e); }
-}
+        const priceInput = prompt("Nhập giá (ETH):");
+        if (!priceInput) return;
 
-// 2. Tải kho hàng của Retailer (Hàng đã nhận nhưng chưa bán)
-async function loadInventory() {
-    const tbody = document.getElementById("myInventoryBody");
-    const wallet = localStorage.getItem("connectedWallet");
-    if (!wallet) return;
+        const contract = window.getContract();
 
-    try {
-        const res = await fetch(`${API_URL}/my-batches/${wallet}`);
-        const result = await res.json();
-        tbody.innerHTML = "";
+        const priceWei = ethers.utils.parseEther(priceInput);
 
-        result.data.forEach(lot => {
-            const tr = `
-                <tr>
-                    <td><strong>${lot.chain_batch_id}</strong></td>
-                    <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.processed_weight} kg</td>
-                    <td><span style="color:#27ae60; font-weight:bold;">${lot.status}</span></td>
-                    <td><button class="btn-view" onclick="viewDetail('${lot.chain_batch_id}')">View</button></td>
-                </tr>`;
-            tbody.insertAdjacentHTML("beforeend", tr);
-        });
-    } catch (e) { console.error(e); }
-}
+        const tx = await contract.setPrice(currentBatchId, priceWei);
+        await tx.wait();
 
-// 3. Xử lý "Bán hàng" (Sell)
-async function sellBatch() {
-    const batchId = document.querySelector(".detail-value.batch-id").textContent;
-    if (batchId === "XXXXXXXX") return alert("Hãy chọn lô hàng từ kho!");
+        console.log("🔥 SET PRICE TX:", tx.hash);
 
-    if (confirm(`Xác nhận bán lô hàng ${batchId} cho khách hàng?`)) {
-        try {
-            const res = await fetch(`${API_URL}/lot/${batchId}/sell`, { method: "POST" });
-            const data = await res.json();
-            if(data.success) { 
-                alert("✅ Đã bán thành công! Sản phẩm đã hoàn tất vòng đời."); 
-                location.reload(); 
-            }
-        } catch (err) { alert(err.message); }
+        alert("✅ Set price thành công!");
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
     }
 }
 
-// 4. Xem chi tiết
-async function viewDetail(batchId) {
-    const res = await fetch(`${API_URL}/trace/${batchId}`);
-    const result = await res.json();
-    if(result.success) {
-        const lot = result.data;
-        document.querySelector(".detail-value.farm-id").textContent = lot.farms?.chain_farm_id;
-        document.querySelector(".detail-value.batch-id").textContent = lot.chain_batch_id;
-        document.querySelector(".detail-value.quantity").textContent = lot.processed_weight + " kg";
-        document.querySelector(".detail-value.status").textContent = lot.status;
-        document.querySelector(".detail-value.current-owner").textContent = "Retailer Store";
-        
-        let certHash = "-";
-        if (lot.farms?.certifications?.[0]) certHash = lot.farms.certifications[0].cert_hash;
-        document.querySelector(".detail-value.cert-hash").textContent = certHash;
-    }
-}
-
-// Khởi chạy và thêm nút Sell
+// =======================
 document.addEventListener("DOMContentLoaded", () => {
     loadAvailable();
     loadInventory();
-    
-    document.querySelector(".btn-open-cert").insertAdjacentHTML(
-        "afterend",
-        '<button class="btn-sell" style="background:#e74c3c; color:white; border:none; padding:8px 24px; border-radius:8px; cursor:pointer; font-size:20px; margin-left:10px;">Sell Batch</button>'
-    );
-    document.querySelector(".btn-sell").addEventListener("click", sellBatch);
 });
-</script>
 </script>
 </body>
 </html>

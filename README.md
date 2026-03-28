@@ -72,3 +72,19 @@ npm install express cors tải server để api chạy bùm chéo
 NHỚ LÚC NÀO CŨNG MỞ
 npx hardhat node
 node server.js
+
+
+# Note của NAH (chạy web thì bắt đầu làm theo các bước sau)
+Chỉ nhìn thư mục block (html,css,js) & backend
+## Tạo 3 terninal chạy local
+1. cd vô thư mục github --> chạy npx hardhat node
+2. cd vô backend --> node server.js
+3. cd vô github -->  npx hardhat run scripts/deploy.js --network localhost --> copy ví bỏ vô file connect.js
+
+## Lấy ví của NAH để chạy, mở console import code trong setup.js vô để gán quyền (metamask popup 5 lần)
+
+Muốn đăng nhập vào từng trang thì đổi địa chỉ ví trong metamask --> bấm connect ở trang main --> đăng xuất thì bấm home.
+
+Phải theo flow từ cer --> farm --> pro --> dis -> retail, vì k có giao diện người dùng nên sau khi mua hàng xong ở role retailer thì mở console nhập code trong customer.js (thay batch_id cần mua) sẽ trả về sold.
+
+## Truy xuất nguồn gốc thì nhập chain_batch_id trong trang truy xuất (vd: 331657)

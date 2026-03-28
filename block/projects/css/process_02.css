@@ -14,7 +14,7 @@ body {
 
 .page-container {
   width: 1440px;
-  min-height: 2582px;
+  min-height: 2250px;
   position: relative;
   background: rgba(27, 46, 23, 0.80);
   overflow: visible;
@@ -139,13 +139,14 @@ body {
   width: 1222px;
   height: 384px;
   background: #F4EFE9;
+  overflow-y: auto; 
+  overflow-x: hidden;
 }
 
 .my-batches-table { top: 846px; }
 
 .batch-table {
   width: 100%;
-  height: 100%;
   border-collapse: collapse;
   color: #1B2E17;
 }
@@ -196,6 +197,7 @@ body {
 .detail-label.cert-hash     { top: 1602px; left: 113px; width: 135px; }
 .detail-label.view-cert     { top: 1680px; left: 113px; width: 250px; }
 .detail-label.change-status { top: 1758px; left: 108px; width: 250px; }
+.detail-label.change-price { top: 1680px; left: 108px; width: 250px; }
 
 .detail-value {
   left: 316px;
@@ -241,18 +243,51 @@ body {
   cursor: pointer;
 }
 
-.status-input {
+/* ===== PRICE INPUT ===== */
+.price-input {
+  width: 288px;
+  height: 33.42px;
+  left: 316px;
+  top: 1680px; /* nằm gần open cert */
+  position: absolute;
+
+  background: #F4EFE9;
+  border-radius: 10px;
+  border: none;
+  padding: 5px 12px;
+
+  font-size: 18px;
+  color: #1B2E17;
+}
+
+/* ===== STATUS SELECT (upgrade nhẹ) ===== */
+.status-select {
   width: 288px;
   height: 33.42px;
   left: 316px;
   top: 1754px;
   position: absolute;
+
   background: #F4EFE9;
   border-radius: 10px;
   border: none;
   padding: 5px 12px;
+
   font-size: 18px;
   color: #1B2E17;
+
+  cursor: pointer;
+}
+
+/* hover + focus cho xịn hơn */
+.status-select:hover,
+.price-input:hover {
+  outline: 2px solid #859E6A;
+}
+
+.status-select:focus,
+.price-input:focus {
+  outline: 2px solid #6f8a57;
 }
 
 .note-textarea {
@@ -275,7 +310,7 @@ body {
   width: 1440px;
   height: 250px;
   left: 0;
-  top: 2431px;
+  top: 2000px;
   position: absolute;
   background: #1B2E17;
 }
@@ -284,7 +319,7 @@ body {
   width: 180px;
   height: 180px;
   left: 108px;
-  top: 2466px;
+  top: 2010px;
   position: absolute;
   background: #D9D9D9;
 }
@@ -293,7 +328,7 @@ body {
   width: 178.97px;
   height: 178.97px;
   left: 108px;
-  top: 2470.08px;
+  top: 2012px;
   position: absolute;
 }
 
@@ -306,5 +341,5 @@ body {
   color: #F4EFE9;
 }
 
-.footer-text.left  { left: 410px; top: 2469px; }
-.footer-text.right { left: 940px; top: 2475px; }
+.footer-text.left  { left: 410px; top: 2010px; }
+.footer-text.right { left: 940px; top: 2010px; }

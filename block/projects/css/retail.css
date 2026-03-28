@@ -140,6 +140,8 @@ body {
   width: 1222px;
   height: 384px;
   background: #F4EFE9;
+  overflow-y: auto; 
+  overflow-x: hidden;
 }
 
 .available-table { top: 842px; }
@@ -147,7 +149,6 @@ body {
 
 .batch-table {
   width: 100%;
-  height: 100%;
   border-collapse: collapse;
   color: #1B2E17;
 }
@@ -197,7 +198,7 @@ body {
 .detail-label.quantity     { top: 2082px; }
 .detail-label.create-at    { top: 2156px; }
 .detail-label.done-at      { top: 2230px; }
-.detail-label.current-owner{ top: 1934px; left: 628px; }
+.detail-label.current-owner{ top: 1934px; left: 628px;width: 500px; }
 .detail-label.retailer     { top: 2008px; left: 628px; width: 135px; }
 .detail-label.cert-hash    { top: 2082px; left: 628px; width: 135px; }
 .detail-label.status       { top: 2156px; left: 628px; width: 135px; }
@@ -216,7 +217,7 @@ body {
 .detail-value.quantity     { top: 2082px; width: 288px; }
 .detail-value.create-at    { top: 2156px; width: 231px; }
 .detail-value.done-at      { top: 2230px; width: 231px; }
-.detail-value.current-owner{ top: 1934px; left: 836px; width: 231px; }
+.detail-value.current-owner{ top: 1934px; left: 836px; width: 500px; }
 .detail-value.retailer     { top: 2008px; left: 836px; width: 231px; }
 .detail-value.cert-hash    { top: 2082px; left: 836px; width: 231px; }
 .detail-value.status       { top: 2156px; left: 836px; width: 231px; }
@@ -273,5 +274,5 @@ body {
   color: #F4EFE9;
 }
 
-.footer-text.left  { left: 410px; top: 2469px; }
-.footer-text.right { left: 940px; top: 2475px; }
+.footer-text.left  { left: 410px; top: 2450px; }
+.footer-text.right { left: 940px; top: 2450px; }

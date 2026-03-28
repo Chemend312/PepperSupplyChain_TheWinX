@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Traceable Organic Pepper</title>
   <link rel="stylesheet" href="../css/main.css">
-  <script src="../js/connect.js"></script>
+  <script src="../js/abi.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="../js/connect.js"></script>
+<script src="../js/role.js"></script>
 </head>
 <body>
 
@@ -41,11 +44,12 @@
   <section class="content-block content-block--two-columns">
     <div class="content-left">
       <h3 id="supply-chain">Traceable Organic Pepper Supply Chain</h3>
-      <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters...</p>
-      
+      <p style="text-align: justify;">
+This system ensures full transparency in the organic pepper supply chain by recording every stage on blockchain. 
+From farm to market, each batch is securely tracked, verified, and accessible in real time.
+</p>
       <div class="small-buttons">
         <a href="cont.html" class="btn btn-small">Trace product</a>
-        <a href="#" class="btn btn-small">Connect Wallet</a>
       </div>
     </div>
 
@@ -61,7 +65,9 @@
 
     <div class="content-right">
       <h3 id="about">About Us</h3>
-      <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters... Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text...</p>
+      <p style="text-align: justify;">
+We are dedicated to building a transparent and trustworthy agricultural supply chain through the power of blockchain technology. Our platform connects certificer, farmers, processors, and distributors, retailer ensuring every step is traceable and verifiable. Together, we create a smarter, safer future for agriculture.
+</p>
     </div>
   </section>
 
@@ -70,59 +76,24 @@
     <div class="footer-logo-placeholder"></div>
     <img class="footer-logo" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
 
-    <div class="footer-text">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>Proin pharetra augue vel ornare interdum.</p>
-    </div>
-
-    <div class="footer-text">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>Proin pharetra augue vel ornare interdum.</p>
-    </div>
-  </footer>
-
+ <div class="footer-text left"> 
+  <br>
+  <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
 </div>
 
-<script>
-// Hàm xử lý UI khi có ví
-function updateWalletUI(account) {
-  const btn = document.getElementById("connectWalletBtn");
-  btn.textContent = account.substring(0,6) + "..." + account.slice(-4);
-  btn.style.backgroundColor = "#28a745"; // Đổi sang màu xanh báo hiệu thành công
-  btn.style.color = "white";
-  btn.style.border = "none";
-}
+<div class="footer-text right">
+  <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
+</div>
+</div>
 
-// Hàm kết nối MetaMask
-async function connectWallet() {
-  if (typeof window.ethereum !== "undefined") {
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const account = accounts[0];
-      
-      // LƯU TRỮ VÍ VÀO BỘ NHỚ TRÌNH DUYỆT
-      localStorage.setItem("connectedWallet", account);
-      
-      alert("✅ Kết nối ví thành công!\nĐịa chỉ: " + account);
-      updateWalletUI(account);
-      
-    } catch (err) {
-      alert("❌ Kết nối ví thất bại: " + err.message);
-    }
-  } else {
-    alert("⚠️ Vui lòng cài đặt tiện ích MetaMask trên trình duyệt!");
-  }
-}
-
-// Kiểm tra xem trước đó người dùng đã đăng nhập chưa khi trang vừa load xong
-window.addEventListener('DOMContentLoaded', () => {
-  const savedWallet = localStorage.getItem("connectedWallet");
-  if (savedWallet) {
-    updateWalletUI(savedWallet); // Nếu đã kết nối rồi thì hiện tên ví luôn
-  }
-});
-
-// Gắn sự kiện cho nút bấm
-document.getElementById("connectWalletBtn").addEventListener("click", connectWallet);
-</script>
+</div>
 
 </body>
 </html>

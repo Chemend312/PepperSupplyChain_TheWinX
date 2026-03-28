@@ -6,16 +6,11 @@
   <title>Processor Dashboard - Traceable Organic Pepper</title>
   <link rel="stylesheet" href="../css/process_01.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/abi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="../js/connect.js"></script>
+  <script src="../js/role.js"></script>
   <style>
-    .btn-buy {
-      background: #859E6A;
-      color: white;
-      border: none;
-      padding: 8px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 20px;
-    }
     .btn-buy:hover {
       background: #6f8a57;
     }
@@ -28,15 +23,6 @@
       border: 1px solid #000;
       background: #F4EFE9;
       border-radius: 4px;
-    }
-
-    .btn-view {
-      background: #1B2E17;
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 6px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -71,14 +57,15 @@
   <div class="table-wrapper available-table">
     <table class="batch-table" id="availableTable">
       <thead>
-        <tr>
-          <th>Batch ID</th>
-          <th>Farm ID</th>
-          <th>Quantity</th>
-          <th>Harvest Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+  <tr>
+    <th>Batch ID</th>
+    <th>Farm ID</th>
+    <th>Quantity</th>
+    <th>Harvest Date</th>
+    <th>Price</th> <!-- ✅ thêm -->
+    <th>Action</th>
+  </tr>
+</thead>
       <tbody>
         <tr data-batch-id="DL0001">
           <td>DL0001</td>
@@ -155,137 +142,204 @@
   <div class="detail-label retailer">Retailer:</div>
   <div class="detail-value retailer">XXXXXXX</div>
 
-  <div class="detail-label cert-hash">Cert hash:</div>
+  <div class="detail-label cert-hash">Cert:</div>
   <div class="detail-value cert-hash">XXXXXXXXXXXXXX</div>
 
   <div class="detail-label status">Status:</div>
   <div class="detail-value status">XXXXXXXXXXXXXX</div>
-
-  <div class="detail-label view-cert">View certificate</div>
-
-  <button class="btn-open-cert">Open Cert</button>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-bg"></div>
     <div class="footer-logo-placeholder"></div>
     <img class="logo-footer" src="../../assets/logo-removebg-preview 2.png" alt="Footer Logo">
-
     <p class="footer-text left">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>The WinX Team</strong><br>
+  Project: Traceable Organic Pepper Supply Chain<br>
+  Course: Smart Contracts & Blockchain Technology<br>
+  Course Code: 252BIM501701<br><br>
     </p>
     <p class="footer-text right">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
-      Integer dapibus dui aliquam, vehicula odio quis, sagittis odio.<br>
-      Proin pharetra augue vel ornare interdum.
+      <strong>Contact Information</strong><br>
+  Email: thewinx.team@gmail.com<br>
+  Phone: 0123 456 789<br>
+  Location: Ho Chi Minh City, Vietnam
+  © 2026 The WinX. All rights reserved.<br>
     </p>
   </footer>
 
 </div>
 <script>
 const API_URL = "http://localhost:3001/api";
-const statusMap = ["Created", "Processing", "Processed", "Shipped", "Sold"];
 
-// 1. Load hàng Farmer đang treo bán
+// =========================
+// CONNECT WALLET
+// =========================
+async function ensureWallet() {
+  let contract = window.getContract();
+
+  if (!contract) {
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    contract = window.getContract();
+  }
+
+  return contract;
+}
+
+// =========================
+// LOAD AVAILABLE
+// =========================
 async function loadAvailable() {
-    const tbody = document.querySelector("#availableTable tbody");
-    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>⏳ Đang tìm lô hàng mới...</td></tr>";
-    
-    try {
-        const res = await fetch(`${API_URL}/available-batches`);
-        const result = await res.json();
-        tbody.innerHTML = "";
-        
-        if (result.data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>Hiện không có lô hàng nào đang rao bán.</td></tr>";
-            return;
-        }
+  const tbody = document.querySelector("#availableTable tbody");
 
-        result.data.forEach(lot => {
-            const row = `
-                <tr data-batch-id="${lot.chain_batch_id}">
-                    <td><strong>${lot.chain_batch_id}</strong></td>
-                    <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.initial_weight} kg</td>
-                    <td>${new Date(lot.harvest_date).toLocaleDateString('vi-VN')}</td>
-                    <td><button class="btn-buy" onclick="buyBatch(this)">Buy</button></td>
-                </tr>`;
-            tbody.insertAdjacentHTML("beforeend", row);
-        });
-    } catch (e) { console.error(e); }
+  const res = await fetch(`${API_URL}/available-batches`);
+  const result = await res.json();
+
+  tbody.innerHTML = "";
+
+  for (const lot of result.data) {
+    const row = `
+      <tr data-batch-id="${lot.chain_batch_id}">
+        <td>${lot.chain_batch_id}</td>
+        <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
+        <td>${lot.initial_weight} kg</td>
+        <td>${lot.harvest_date || 'N/A'}</td>
+        <td>${lot.price || 0.001}</td>
+        <td>
+          <button style="font-weight:bold;background:green;color:white;padding:10px" class="btn-buy" onclick="buyBatch(this)">Buy</button>
+        </td>
+      </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
+  }
 }
-
-// 2. Load hàng mình đã mua
+// =========================
+// LOAD MY BATCHES
+// =========================
 async function loadMyBatches() {
-    const tbody = document.getElementById("myBatchesBody");
-    const wallet = localStorage.getItem("connectedWallet");
-    if (!wallet) return;
+  const tbody = document.getElementById("myBatchesBody");
+  const wallet = localStorage.getItem("connectedWallet");
 
-    try {
-        const res = await fetch(`${API_URL}/api/my-batches/${wallet}`);
-        const result = await res.json();
-        tbody.innerHTML = "";
+  if (!wallet) return;
 
-        result.data.forEach(lot => {
-            const tr = `
-                <tr>
-                    <td><strong>${lot.chain_batch_id}</strong></td>
-                    <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
-                    <td>${lot.processed_weight || lot.initial_weight} kg</td>
-                    <td><span style="color:#27ae60; font-weight:bold;">${lot.status}</span></td>
-                    <td>
-                        <button class="btn-view" onclick="viewDetail('${lot.chain_batch_id}')">View</button>
-                        ${lot.status === 'Processing' ? `<button class="btn-buy" style="background:#e67e22" onclick="processBatch('${lot.chain_batch_id}')">Process</button>` : ''}
-                        ${lot.status === 'Processed' ? `<button class="btn-buy" style="background:#2980b9" onclick="shipBatch('${lot.chain_batch_id}')">Ship</button>` : ''}
-                    </td>
-                </tr>`;
-            tbody.insertAdjacentHTML("beforeend", tr);
-        });
-    } catch (e) { console.error(e); }
+  const res = await fetch(`${API_URL}/my-batches/${wallet}`);
+  const result = await res.json();
+
+  tbody.innerHTML = "";
+
+  result.data.forEach(lot => {
+    const row = `
+      <tr>
+        <td>${lot.chain_batch_id}</td>
+        <td>${lot.farms?.chain_farm_id || 'N/A'}</td>
+        <td>${lot.initial_weight} kg</td>
+        <td>${lot.status}</td>
+        <td>
+          <button style="font-weight:bold;background:black;color:white;padding:10px" class="btn-view" onclick="viewDetail('${lot.chain_batch_id}')">View</button>
+        </td>
+      </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
+  });
 }
 
-// 3. Xử lý Mua hàng
+// =========================
+// BUY (FULL FIX)
+// =========================
 async function buyBatch(btn) {
-    const row = btn.closest("tr");
-    const batchId = row.getAttribute("data-batch-id");
-    const wallet = localStorage.getItem("connectedWallet");
+  const row = btn.closest("tr");
+  let batchId = row.getAttribute("data-batch-id");
 
-    if (!wallet) return alert("Hãy kết nối ví Processor!");
+  batchId = String(batchId).trim();
+  console.log("🔥 FRONT batchId:", batchId);
 
-    if (confirm(`Xác nhận mua lô hàng ${batchId}?`)) {
-        const res = await fetch(`${API_URL}/lot/${batchId}/buy`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newOwnerWallet: wallet })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert("✅ Giao dịch thành công!");
-            location.reload();
-        }
-    }
-}
+  const contract = await ensureWallet();
 
-// 4. Xem chi tiết (Đổ data xuống phần DETAIL)
-async function viewDetail(batchId) {
-    const res = await fetch(`http://localhost:3001/api/trace/${batchId}`);
+  try {
+    const wallet = await contract.signer.getAddress();
+    localStorage.setItem("connectedWallet", wallet.toLowerCase());
+
+    const lot = await contract.getLot(batchId);
+    const price = lot.price;
+
+    if (price.eq(0)) return alert("Chưa có giá");
+
+    const tx = await contract.buyLot(batchId, { value: price });
+    await tx.wait();
+
+    console.log("🔥 TX:", tx.hash);
+
+    const res = await fetch(`${API_URL}/lot/${batchId}/buy`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        buyer: wallet,
+        txHash: tx.hash
+      })
+    });
+
     const result = await res.json();
-    if(result.success) {
-        const lot = result.data;
-        document.querySelector(".detail-value.farm-id").textContent = lot.farms?.chain_farm_id;
-        document.querySelector(".detail-value.batch-id").textContent = lot.chain_batch_id;
-        document.querySelector(".detail-value.quantity").textContent = (lot.processed_weight || lot.initial_weight) + " kg";
-        document.querySelector(".detail-value.status").textContent = lot.status;
-        document.querySelector(".detail-value.current-owner").textContent = lot.users?.wallet_address.substring(0,15) + "...";
-    }
-}
+    console.log("🔥 API:", result);
 
-// Khởi chạy
-document.addEventListener("DOMContentLoaded", () => {
+    if (!result.success) throw new Error(result.message);
+
+    alert("✅ Thành công");
+
     loadAvailable();
     loadMyBatches();
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ " + err.message);
+  }
+}
+async function viewDetail(batchId) {
+  try {
+    console.log("👁 VIEW:", batchId);
+
+    const res = await fetch(`${API_URL}/lot/${batchId}`);
+    const result = await res.json();
+
+    const lot = result.data;
+    if (!lot) return alert("Không tìm thấy batch");
+
+    // ===== ĐỔ DATA XUỐNG UI =====
+    document.querySelector(".detail-value.farm-id").innerText =
+      lot.farms?.chain_farm_id || "N/A";
+
+    document.querySelector(".detail-value.batch-id").innerText =
+      lot.chain_batch_id;
+
+    document.querySelector(".detail-value.quantity").innerText =
+      lot.initial_weight;
+
+    document.querySelector(".detail-value.create-at").innerText =
+      lot.created_at || "N/A";
+
+    document.querySelector(".detail-value.done-at").innerText =
+      lot.updated_at || "N/A";
+
+    document.querySelector(".detail-value.current-owner").innerText =
+      lot.owner_id || "N/A";
+
+    document.querySelector(".detail-value.retailer").innerText =
+      lot.retailer_id || "N/A";
+
+    document.querySelector(".detail-value.cert-hash").innerText =
+      lot.tx_hash || "Đã xác thực";
+
+    document.querySelector(".detail-value.status").innerText =
+      lot.status;
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Load detail failed");
+  }
+}
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+  loadAvailable();
+  loadMyBatches();
 });
 </script>
 </body>
