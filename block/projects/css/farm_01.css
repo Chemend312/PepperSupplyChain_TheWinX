@@ -170,7 +170,8 @@ body {
   left: 108px;
   top: 1900px;
   width: 1222px;
-  height: 384px;
+  min-height: 120px;
+  max-height: 384px;
   background: #F4EFE9;
 
   overflow-y: auto; 

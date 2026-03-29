@@ -119,11 +119,6 @@
   <!-- Vertical divider in detail -->
   <div class="vertical-divider-detail"></div>
   <!-- Timeline -->
-<div class="timeline">
-  <div class="timeline-line"></div>
-  <div class="timeline-arrow"></div>
-
-</div>
 
 <!-- Image grid -->
 <div class="image-grid">
@@ -135,10 +130,6 @@
   <img src="../../assets/1 1.png">
 </div>
 
-  <!-- Status indicators -->
-  <div class="status-indicator left">XXX</div>
-  <div class="status-indicator middle">XXX</div>
-  <div class="status-indicator right">XXX</div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -187,7 +178,9 @@ async function loadMyBatches() {
           <td>${harvestDate}</td>
           <td>${lot.initial_weight} kg</td>
           <td><span style="color: green; font-weight: bold;">${lot.status}</span></td>
-          <td>Click xem chi tiết</td>
+          <td>
+          <button style="font-weight:bold;background:black;color:white;padding:10px" class="btn-view" onclick="viewDetail('${lot.chain_batch_id}')">View</button>
+          </td>
         </tr>
       `;
       tableBody.insertAdjacentHTML("beforeend", row);
